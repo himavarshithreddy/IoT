@@ -393,18 +393,29 @@ function updateLightUI(lightValue) {
   const indicator = document.getElementById('lightIndicator');
   const stateEl = document.getElementById('lightState');
   if (!indicator || !stateEl) return;
+  const numeric = Number(lightValue);
   indicator.classList.remove('light-low', 'light-medium', 'light-high');
+  // Clear any inline styles by default; we will set them for moderate state
+  indicator.style.boxShadow = '';
+  indicator.style.background = '';
   let stateLabel = 'Moderate';
-  if (typeof lightValue === 'number') {
-    if (lightValue >= LIGHT_THRESHOLDS.high) {
+  if (Number.isFinite(numeric)) {
+    if (numeric >= LIGHT_THRESHOLDS.high) {
       indicator.classList.add('light-high');
       stateLabel = 'Bright';
-    } else if (lightValue <= LIGHT_THRESHOLDS.low) {
+    } else if (numeric <= LIGHT_THRESHOLDS.low) {
       indicator.classList.add('light-low');
       stateLabel = 'Dark';
     } else {
       indicator.classList.add('light-medium');
       stateLabel = 'Moderate';
+      // Within moderate range, progressively increase glow/color based on value
+      const span = LIGHT_THRESHOLDS.high - LIGHT_THRESHOLDS.low;
+      const frac = span > 0 ? Math.min(1, Math.max(0, (numeric - LIGHT_THRESHOLDS.low) / span)) : 0;
+      const glowAlpha = 0.12 + 0.28 * frac; // 0.12 → 0.40
+      const centerAlpha = 0.25 + 0.35 * frac; // 0.25 → 0.60
+      indicator.style.boxShadow = `0 0 10px rgba(255, 215, 128, ${glowAlpha})`;
+      indicator.style.background = `radial-gradient(closest-side, rgba(255, 215, 128, ${centerAlpha}) 0%, #2f2f2f 70%, #1a1a1a 100%)`;
     }
   } else {
     indicator.classList.add('light-low');
