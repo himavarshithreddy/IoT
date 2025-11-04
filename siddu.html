@@ -215,6 +215,43 @@
     border: 1px solid #3a2020;
   }
   
+  /* Light indicator */
+  .light-indicator {
+    width: clamp(48px, 12vw, 64px);
+    height: clamp(48px, 12vw, 64px);
+    border-radius: 50%;
+    margin: 10px auto 0 auto;
+    border: 2px solid #333;
+    transition: box-shadow 0.25s ease, background 0.25s ease;
+  }
+  .light-state {
+    display: block;
+    margin-top: 8px;
+    color: #aaa;
+    font-size: clamp(11px, 2.5vw, 13px);
+    font-weight: 500;
+  }
+  
+  .light-low {
+    background: radial-gradient(closest-side, #2a2a2a 0%, #1e1e1e 60%, #161616 100%);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.6);
+  }
+  .light-medium {
+    background: radial-gradient(closest-side, #555 0%, #2f2f2f 70%, #1a1a1a 100%);
+    box-shadow: 0 0 8px rgba(255,255,255,0.15);
+  }
+  .light-high {
+    background: radial-gradient(closest-side, #ffd24a 0%, #caa63a 70%, #1a1a1a 100%);
+    box-shadow: 0 0 12px rgba(255,210,74,0.45), 0 0 24px rgba(255,210,74,0.25);
+    animation: pulseGlow 1.6s ease-out infinite;
+  }
+  
+  @keyframes pulseGlow {
+    0% { box-shadow: 0 0 0 0 rgba(255,210,74,0.45), 0 0 24px rgba(255,210,74,0.25); }
+    70% { box-shadow: 0 0 0 16px rgba(255,210,74,0), 0 0 10px rgba(255,210,74,0.2); }
+    100% { box-shadow: 0 0 0 0 rgba(255,210,74,0), 0 0 24px rgba(255,210,74,0.25); }
+  }
+  
   /* Mobile-specific optimizations */
   @media (max-width: 480px) {
     body {
@@ -265,6 +302,13 @@
   <div class="sensor-item">
     <p>Humidity</p>
     <div id="hum" class="value">-- %</div>
+  </div>
+  
+  <div class="sensor-item">
+    <p>Light</p>
+    <div id="light" class="value">-- %</div>
+    <div id="lightIndicator" class="light-indicator light-low" aria-label="Light indicator"></div>
+    <small id="lightState" class="light-state">—</small>
   </div>
 </div>
 
@@ -317,10 +361,14 @@ function renderHistory(list) {
   empty.style.display = 'none';
   list.forEach(item => {
     const li = document.createElement('li');
+    const lightHtml = (item.light === undefined || item.light === null) ? '' : `
+        <div class="history-value">💡 ${item.light}%</div>
+      `;
     li.innerHTML = `<div class="history-item-content">
       <div class="history-values">
         <div class="history-value">🌡️ ${item.temperature}°C</div>
         <div class="history-value">💧 ${item.humidity}%</div>
+        ${lightHtml}
       </div>
       <div class="history-time">${formatTime(item.time)}</div>
     </div>`;
@@ -336,7 +384,34 @@ document.getElementById('clearHistoryBtn').addEventListener('click', () => {
 // Initialize history on load
 let historyList = loadHistory();
 renderHistory(historyList);
-let lastRecorded = historyList.length ? { t: historyList[0].temperature, h: historyList[0].humidity } : null; // we render newest-first later
+let lastRecorded = historyList.length ? { t: historyList[0].temperature, h: historyList[0].humidity, l: historyList[0].light } : null; // we render newest-first later
+
+// Light thresholds for 0–100 scale
+const LIGHT_THRESHOLDS = { low: 20, high: 70 };
+
+function updateLightUI(lightValue) {
+  const indicator = document.getElementById('lightIndicator');
+  const stateEl = document.getElementById('lightState');
+  if (!indicator || !stateEl) return;
+  indicator.classList.remove('light-low', 'light-medium', 'light-high');
+  let stateLabel = 'Moderate';
+  if (typeof lightValue === 'number') {
+    if (lightValue >= LIGHT_THRESHOLDS.high) {
+      indicator.classList.add('light-high');
+      stateLabel = 'Bright';
+    } else if (lightValue <= LIGHT_THRESHOLDS.low) {
+      indicator.classList.add('light-low');
+      stateLabel = 'Dark';
+    } else {
+      indicator.classList.add('light-medium');
+      stateLabel = 'Moderate';
+    }
+  } else {
+    indicator.classList.add('light-low');
+    stateLabel = '—';
+  }
+  stateEl.textContent = stateLabel;
+}
 
 async function fetchData() {
   const err = document.getElementById('errorMsg');
@@ -350,20 +425,25 @@ async function fetchData() {
     if (!last) return;
     document.getElementById("temp").textContent = last.temperature + " °C";
     document.getElementById("hum").textContent  = last.humidity + " %";
+    if (last.light !== undefined) {
+      document.getElementById("light").textContent = last.light + " %";
+      updateLightUI(last.light);
+    }
 
     // Append to history only if values changed to avoid flooding
-    const changed = !lastRecorded || last.temperature !== lastRecorded.t || last.humidity !== lastRecorded.h;
+    const changed = !lastRecorded || last.temperature !== lastRecorded.t || last.humidity !== lastRecorded.h || last.light !== lastRecorded.l;
     if (changed) {
       const entry = {
         time: new Date().toISOString(),
         temperature: last.temperature,
-        humidity: last.humidity
+        humidity: last.humidity,
+        light: last.light
       };
       // newest first
       historyList = [entry, ...historyList].slice(0, MAX_HISTORY);
       saveHistory(historyList);
       renderHistory(historyList);
-      lastRecorded = { t: last.temperature, h: last.humidity };
+      lastRecorded = { t: last.temperature, h: last.humidity, l: last.light };
     }
   } catch (e) {
     if (err) err.style.display = 'inline';
