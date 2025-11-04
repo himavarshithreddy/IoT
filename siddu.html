@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Live IoT Data</title>
 <style>
   * {
@@ -342,6 +344,7 @@ async function fetchData() {
     let res = await fetch(url);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     let data = await res.json();
+    if (err) err.style.display = 'none';
 
     let last = data[data.length - 1];
     if (!last) return;
@@ -362,7 +365,6 @@ async function fetchData() {
       renderHistory(historyList);
       lastRecorded = { t: last.temperature, h: last.humidity };
     }
-    if (err) err.style.display = 'none';
   } catch (e) {
     if (err) err.style.display = 'inline';
   }
