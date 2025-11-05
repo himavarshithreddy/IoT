@@ -326,9 +326,8 @@
   <small id="errorMsg" style="display:none;">Could not fetch data. Retrying…</small>
 </div>
 
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <script>
-const url = "/api/sensor";
-
 // ---- Persistent history helpers ----
 const HISTORY_KEY = 'sensorHistory';
 const MAX_HISTORY = 50;
@@ -364,14 +363,7 @@ function renderHistory(list) {
     const lightHtml = (item.light === undefined || item.light === null) ? '' : `
         <div class="history-value">💡 ${item.light}%</div>
       `;
-    li.innerHTML = `<div class="history-item-content">
-      <div class="history-values">
-        <div class="history-value">🌡️ ${item.temperature}°C</div>
-        <div class="history-value">💧 ${item.humidity}%</div>
-        ${lightHtml}
-      </div>
-      <div class="history-time">${formatTime(item.time)}</div>
-    </div>`;
+    li.innerHTML = `<div class=\"history-item-content\">\n      <div class=\"history-values\">\n        <div class=\"history-value\">🌡️ ${item.temperature}°C</div>\n        <div class=\"history-value\">💧 ${item.humidity}%</div>\n        ${lightHtml}\n      </div>\n      <div class=\"history-time\">${formatTime(item.time)}</div>\n    </div>`;
     ul.appendChild(li);
   });
 }
@@ -384,7 +376,7 @@ document.getElementById('clearHistoryBtn').addEventListener('click', () => {
 // Initialize history on load
 let historyList = loadHistory();
 renderHistory(historyList);
-let lastRecorded = historyList.length ? { t: historyList[0].temperature, h: historyList[0].humidity, l: historyList[0].light } : null; // we render newest-first later
+let lastRecorded = historyList.length ? { t: historyList[0].temperature, h: historyList[0].humidity, l: historyList[0].light } : null; // newest-first
 
 // Light thresholds for 0–100 scale
 const LIGHT_THRESHOLDS = { low: 20, high: 70 };
@@ -395,7 +387,6 @@ function updateLightUI(lightValue) {
   if (!indicator || !stateEl) return;
   const numeric = Number(lightValue);
   indicator.classList.remove('light-low', 'light-medium', 'light-high');
-  // Clear any inline styles by default; we will set them for moderate state
   indicator.style.boxShadow = '';
   indicator.style.background = '';
   let stateLabel = 'Moderate';
@@ -409,12 +400,11 @@ function updateLightUI(lightValue) {
     } else {
       indicator.classList.add('light-medium');
       stateLabel = 'Moderate';
-      // Within moderate range, progressively increase glow/color based on value
       const span = LIGHT_THRESHOLDS.high - LIGHT_THRESHOLDS.low;
       const frac = span > 0 ? Math.min(1, Math.max(0, (numeric - LIGHT_THRESHOLDS.low) / span)) : 0;
-      const glowAlpha = 0.25 + 0.50 * frac; // 0.25 → 0.75
-      const centerAlpha = 0.45 + 0.50 * frac; // 0.45 → 0.95
-      const glowBlur = 10 + 20 * frac; // 10px → 30px
+      const glowAlpha = 0.25 + 0.50 * frac;
+      const centerAlpha = 0.45 + 0.50 * frac;
+      const glowBlur = 10 + 20 * frac;
       const outerBlur = Math.round(glowBlur * 1.6);
       indicator.style.boxShadow = `0 0 ${glowBlur}px rgba(255, 215, 128, ${glowAlpha}), 0 0 ${outerBlur}px rgba(255, 215, 128, ${glowAlpha * 0.6})`;
       indicator.style.background = `radial-gradient(closest-side, rgba(255, 215, 128, ${centerAlpha}) 0%, #3a3a3a 65%, #1a1a1a 100%)`;
@@ -426,45 +416,105 @@ function updateLightUI(lightValue) {
   stateEl.textContent = stateLabel;
 }
 
-async function fetchData() {
-  const err = document.getElementById('errorMsg');
-  try {
-    let res = await fetch(url);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    let data = await res.json();
-    if (err) err.style.display = 'none';
+// ---- MQTT (HiveMQ Cloud over WebSockets) ----
+const MQTT_URL = 'wss://c047bd013b954dfd8ac40154210890bf.s1.eu.hivemq.cloud:8884/mqtt';
+const MQTT_OPTIONS = {
+  username: 'espuser',
+  password: 'Esp12345',
+  keepalive: 30,
+  clean: true,
+  reconnectPeriod: 1500,
+  connectTimeout: 8000,
+  protocolVersion: 4
+};
 
-    let last = data[data.length - 1];
-    if (!last) return;
-    document.getElementById("temp").textContent = last.temperature + " °C";
-    document.getElementById("hum").textContent  = last.humidity + " %";
-    if (last.light !== undefined) {
-      document.getElementById("light").textContent = last.light + " %";
-      updateLightUI(last.light);
-    }
+const TOPICS = ['iot/data/temperature', 'iot/data/humidity', 'iot/data/light'];
 
-    // Append to history only if values changed to avoid flooding
-    const changed = !lastRecorded || last.temperature !== lastRecorded.t || last.humidity !== lastRecorded.h || last.light !== lastRecorded.l;
-    if (changed) {
-      const entry = {
-        time: new Date().toISOString(),
-        temperature: last.temperature,
-        humidity: last.humidity,
-        light: last.light
-      };
-      // newest first
-      historyList = [entry, ...historyList].slice(0, MAX_HISTORY);
-      saveHistory(historyList);
-      renderHistory(historyList);
-      lastRecorded = { t: last.temperature, h: last.humidity, l: last.light };
-    }
-  } catch (e) {
-    if (err) err.style.display = 'inline';
+const err = document.getElementById('errorMsg');
+if (err) { err.textContent = 'Connecting to MQTT…'; err.style.display = 'inline'; }
+
+// Seed UI from last saved history, if available
+if (historyList.length) {
+  const last = historyList[0];
+  if (last.temperature !== undefined) document.getElementById('temp').textContent = last.temperature + ' °C';
+  if (last.humidity !== undefined) document.getElementById('hum').textContent = last.humidity + ' %';
+  if (last.light !== undefined) {
+    document.getElementById('light').textContent = last.light + ' %';
+    updateLightUI(last.light);
   }
 }
 
-setInterval(fetchData, 1500);
-fetchData();
+let current = {
+  temperature: historyList[0]?.temperature,
+  humidity: historyList[0]?.humidity,
+  light: historyList[0]?.light
+};
+
+let client;
+try {
+  client = mqtt.connect(MQTT_URL, MQTT_OPTIONS);
+} catch (e) {
+  if (err) { err.textContent = 'Failed to init MQTT client.'; err.style.display = 'inline'; }
+}
+
+if (client) {
+  client.on('connect', () => {
+    if (err) err.style.display = 'none';
+    client.subscribe(TOPICS, (subErr) => {
+      if (subErr && err) {
+        err.textContent = 'MQTT subscribe failed. Retrying…';
+        err.style.display = 'inline';
+      }
+    });
+  });
+
+  client.on('reconnect', () => {
+    if (err) { err.textContent = 'MQTT reconnecting…'; err.style.display = 'inline'; }
+  });
+
+  client.on('offline', () => {
+    if (err) { err.textContent = 'MQTT offline. Reconnecting…'; err.style.display = 'inline'; }
+  });
+
+  client.on('error', () => {
+    if (err) { err.textContent = 'MQTT error. Retrying…'; err.style.display = 'inline'; }
+  });
+
+  client.on('message', (topic, payload) => {
+    const text = payload ? payload.toString() : '';
+    const num = Number(text);
+    if (!Number.isFinite(num)) return;
+
+    if (topic === 'iot/data/temperature') {
+      const v = Number(num.toFixed(1));
+      document.getElementById('temp').textContent = v + ' °C';
+      current.temperature = v;
+    } else if (topic === 'iot/data/humidity') {
+      const v = Number(num.toFixed(1));
+      document.getElementById('hum').textContent = v + ' %';
+      current.humidity = v;
+    } else if (topic === 'iot/data/light') {
+      const v = Math.round(num);
+      document.getElementById('light').textContent = v + ' %';
+      updateLightUI(v);
+      current.light = v;
+    }
+
+    const changed = !lastRecorded || current.temperature !== lastRecorded.t || current.humidity !== lastRecorded.h || current.light !== lastRecorded.l;
+    if (changed && current.temperature != null && current.humidity != null) {
+      const entry = {
+        time: new Date().toISOString(),
+        temperature: current.temperature,
+        humidity: current.humidity,
+        light: current.light
+      };
+      historyList = [entry, ...historyList].slice(0, MAX_HISTORY);
+      saveHistory(historyList);
+      renderHistory(historyList);
+      lastRecorded = { t: current.temperature, h: current.humidity, l: current.light };
+    }
+  });
+}
 </script>
 
 </body>
