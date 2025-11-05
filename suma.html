@@ -135,10 +135,10 @@
     animation: blinkPulse 2000ms ease-out 1;
   }
   @keyframes blinkPulse {
-    0% { opacity: 0.3; transform: scale(0.9); }
-    25% { opacity: 1; transform: scale(1.08); }
-    60% { opacity: 1; transform: scale(1.05); }
-    100% { opacity: 1; transform: scale(1); }
+    0% { opacity: 0.3; }
+    25% { opacity: 1; }
+    60% { opacity: 1; }
+    100% { opacity: 1; }
   }
 
   /* Charts */
@@ -232,8 +232,8 @@
       <canvas id="chartCustomers" aria-label="Customers chart"></canvas>
     </div>
     <div class="chart-card">
-      <div class="chart-title">Entry/Exit Events Timeline</div>
-      <canvas id="chartEvents" aria-label="Events timeline chart"></canvas>
+      <div class="chart-title">Customer Traffic Rate (per minute)</div>
+      <canvas id="chartTraffic" aria-label="Traffic rate chart"></canvas>
     </div>
   </div>
   <small style="color:#777; display:block; margin-top:8px;">Last 50 readings</small>
@@ -247,21 +247,22 @@
 // ---- Charts state ----
 const MAX_HISTORY = 50;
 let customersHistory = [];
-let eventsHistory = [];
-let customersChart, eventsChart;
+let trafficRateData = []; // {t: Date, entries: 0, exits: 0}
+let customersChart, trafficChart;
 
-function createOrUpdateChart(chartRef, canvasId, label, labels, data, color, yBounds) {
+function createOrUpdateChart(chartRef, canvasId, label, labels, data, color, yBounds, datasets) {
   const ctx = document.getElementById(canvasId);
   if (!ctx) return chartRef;
   if (!chartRef) {
+    const chartDatasets = datasets || [{ label, data, borderColor: color, backgroundColor: color + '33', tension: 0.25, fill: true, pointRadius: 0, borderWidth: 2 }];
     return new Chart(ctx, {
       type: 'line',
-      data: { labels, datasets: [{ label, data, borderColor: color, backgroundColor: color + '33', tension: 0.25, fill: true, pointRadius: 0, borderWidth: 2 }] },
+      data: { labels, datasets: chartDatasets },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
-        plugins: { legend: { display: false }, tooltip: { enabled: true } },
+        plugins: { legend: { display: datasets ? true : false }, tooltip: { enabled: true } },
         scales: {
           x: { ticks: { color: '#aaa', maxRotation: 0, autoSkip: true }, grid: { color: 'rgba(255,255,255,0.06)' } },
           y: { ticks: { color: '#aaa' }, grid: { color: 'rgba(255,255,255,0.06)' }, min: yBounds?.min, max: yBounds?.max, suggestedMin: yBounds?.suggestedMin, suggestedMax: yBounds?.suggestedMax }
@@ -270,7 +271,11 @@ function createOrUpdateChart(chartRef, canvasId, label, labels, data, color, yBo
     });
   } else {
     chartRef.data.labels = labels;
-    chartRef.data.datasets[0].data = data;
+    if (datasets) {
+      chartRef.data.datasets = datasets;
+    } else {
+      chartRef.data.datasets[0].data = data;
+    }
     chartRef.update('none');
     return chartRef;
   }
@@ -287,15 +292,20 @@ function renderCharts() {
   const custData = customersHistory.map(i => i.v);
   customersChart = createOrUpdateChart(customersChart, 'chartCustomers', 'Customers', custLabels, custData, '#ffb74d', { min: 0, suggestedMax: Math.max(5, Math.ceil((Math.max(0, ...custData) + 1) / 5) * 5) });
 
-  // Events chart: map entry=1, exit=-1
-  const eventLabels = eventsHistory.map(i => i.t.toLocaleTimeString());
-  const eventData = eventsHistory.map(i => i.v === 'entry' ? 1 : (i.v === 'exit' ? -1 : 0));
-  eventsChart = createOrUpdateChart(eventsChart, 'chartEvents', 'Events', eventLabels, eventData, '#34d399', { min: -1.5, max: 1.5, ticks: { callback: v => v === 1 ? 'Entry' : (v === -1 ? 'Exit' : '') } });
+  // Traffic rate chart: entries and exits per minute
+  const trafficLabels = trafficRateData.map(i => i.t.toLocaleTimeString());
+  const entriesData = trafficRateData.map(i => i.entries);
+  const exitsData = trafficRateData.map(i => i.exits);
+  const trafficDatasets = [
+    { label: 'Entries', data: entriesData, borderColor: '#34d399', backgroundColor: '#34d39933', tension: 0.25, fill: true, pointRadius: 2, borderWidth: 2 },
+    { label: 'Exits', data: exitsData, borderColor: '#f59e0b', backgroundColor: '#f59e0b33', tension: 0.25, fill: true, pointRadius: 2, borderWidth: 2 }
+  ];
+  trafficChart = createOrUpdateChart(trafficChart, 'chartTraffic', 'Traffic', trafficLabels, null, null, { min: 0, suggestedMax: 5 }, trafficDatasets);
 }
 
 document.getElementById('clearBtn').addEventListener('click', () => {
   customersHistory = [];
-  eventsHistory = [];
+  trafficRateData = [];
   renderCharts();
 });
 
@@ -310,6 +320,38 @@ function pulseGate(which) {
     exit.classList.add('gate-exit-active', 'blink');
     setTimeout(() => exit.classList.remove('gate-exit-active', 'blink'), 2000);
   }
+}
+
+// ---- Traffic rate tracker ----
+let currentMinuteKey = '';
+let currentMinuteEntries = 0;
+let currentMinuteExits = 0;
+
+function getMinuteKey(date) {
+  const h = date.getHours();
+  const m = date.getMinutes();
+  return `${h}:${m < 10 ? '0' : ''}${m}`;
+}
+
+function recordTrafficEvent(eventType) {
+  const now = new Date();
+  const minuteKey = getMinuteKey(now);
+  
+  if (minuteKey !== currentMinuteKey) {
+    // New minute: push previous minute data
+    if (currentMinuteKey !== '') {
+      const prevTime = new Date(now);
+      prevTime.setMinutes(prevTime.getMinutes() - 1);
+      trafficRateData.push({ t: prevTime, entries: currentMinuteEntries, exits: currentMinuteExits });
+      if (trafficRateData.length > MAX_HISTORY) trafficRateData.shift();
+    }
+    currentMinuteKey = minuteKey;
+    currentMinuteEntries = 0;
+    currentMinuteExits = 0;
+  }
+  
+  if (eventType === 'entry') currentMinuteEntries++;
+  else if (eventType === 'exit') currentMinuteExits++;
 }
 
 // Initial setup: no distance scale
@@ -376,11 +418,11 @@ if (client) {
       const evt = text.trim().toLowerCase();
       if (evt === 'entry') {
         pulseGate('entry');
-        pushHistory(eventsHistory, 'entry');
+        recordTrafficEvent('entry');
         renderCharts();
       } else if (evt === 'exit') {
         pulseGate('exit');
-        pushHistory(eventsHistory, 'exit');
+        recordTrafficEvent('exit');
         renderCharts();
       }
       return;
