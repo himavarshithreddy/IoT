@@ -92,11 +92,7 @@
     overflow: visible;
   }
   
-  /* Object styling */
-  .object {
-    transition: transform 520ms ease;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
-  }
+  /* removed moving object styling */
   
   .legend {
     display: flex;
@@ -119,6 +115,52 @@
     font-weight: 500;
     border: 1px solid #3a2020;
   }
+
+  /* Gates and event lights */
+  .gate {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35));
+  }
+  .gate-label {
+    font-size: 14px;
+    font-weight: 600;
+    fill: rgba(255,255,255,0.8);
+    text-anchor: middle;
+  }
+  .gate-post { fill: #2f2f2f; stroke: #555; stroke-width: 2; }
+  .gate-bar  { fill: #3a3a3a; }
+  .gate-light { fill: #555; }
+  .gate-entry-active .gate-light { fill: #34d399; }
+  .gate-exit-active .gate-light { fill: #f59e0b; }
+  .blink {
+    animation: blinkPulse 900ms ease-out 1;
+  }
+  @keyframes blinkPulse {
+    0% { opacity: 0.3; transform: scale(0.9); }
+    40% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  /* Charts */
+  .charts-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .chart-card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .chart-title {
+    font-size: clamp(12px, 3vw, 13px);
+    color: #aaa;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  canvas { width: 100% !important; height: 180px !important; }
 
   /* Mobile tweaks */
   @media (max-width: 768px) {
@@ -151,128 +193,116 @@
 <div class="subtitle">Sumanaswi Akkisetty, RA2211026010158</div>
 
 <div class="card">
+  
+
   <div class="sensor-item">
-    <p>Distance</p>
-    <div id="distanceVal" class="value">-- cm</div>
+    <p>Customers</p>
+    <div id="customerVal" class="value">0</div>
   </div>
 
-  <div id="scaleWrap" class="viz" aria-label="Distance visualization">
-    <svg id="scaleSvg" viewBox="0 0 1100 280" preserveAspectRatio="xMidYMid meet">
-      <!-- Background grid (blended) -->
-      <defs>
-        <pattern id="smallGrid" width="20" height="20" patternUnits="userSpaceOnUse">
-          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-        </pattern>
-        <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
-          <rect width="100" height="100" fill="url(#smallGrid)"/>
-          <path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="1"/>
-        </pattern>
-      </defs>
-      <rect x="0" y="0" width="1100" height="280" fill="url(#grid)" />
-
-      <!-- Ground line -->
-      <line x1="50" y1="210" x2="1050" y2="210" stroke="#3a3a3a" stroke-width="3" />
-
-      <!-- Sensor base (fixed at left) -->
-      <g id="sensor" transform="translate(90,155)">
-        <rect x="-20" y="0" width="40" height="55" rx="6" fill="#2f2f2f" stroke="#555"/>
-        <rect x="-14" y="6" width="28" height="18" rx="3" fill="#0e7c7b" />
-        <circle cx="0" cy="36" r="6" fill="#888" />
-        <rect x="-6" y="44" width="12" height="6" rx="2" fill="#aaa" />
+  <div id="scaleWrap" class="viz" aria-label="Gate visualization">
+    <svg id="scaleSvg" viewBox="0 0 1100 180" preserveAspectRatio="xMidYMid meet">
+      <!-- Entry Gate (left) -->
+      <g id="gateEntry" class="gate" transform="translate(180,60)">
+        <rect class="gate-post" x="-10" y="0" width="20" height="90" rx="4" />
+        <rect class="gate-bar" x="10" y="20" width="90" height="12" rx="3" />
+        <circle class="gate-light" cx="0" cy="-16" r="8" />
+        <text class="gate-label" x="50" y="60">ENTRY</text>
       </g>
 
-      <!-- Ticks and labels (0..MAX_CM) -->
-      <g id="ticks"></g>
-
-      <!-- Object that moves with distance - Car -->
-      <g id="object" class="object" transform="translate(120,150)">
-        <!-- Car body -->
-        <rect x="-35" y="35" width="70" height="28" rx="4" fill="#3b82f6" stroke="#2563eb" stroke-width="2"/>
-        <!-- Car roof/cabin -->
-        <path d="M -20 35 L -15 20 L 15 20 L 20 35 Z" fill="#2563eb" stroke="#1e40af" stroke-width="1.5"/>
-        <!-- Windows -->
-        <rect x="-18" y="23" width="15" height="10" rx="2" fill="rgba(255,255,255,0.3)"/>
-        <rect x="3" y="23" width="15" height="10" rx="2" fill="rgba(255,255,255,0.3)"/>
-        <!-- Wheels -->
-        <circle cx="-22" cy="63" r="8" fill="#1f2937" stroke="#374151" stroke-width="2"/>
-        <circle cx="-22" cy="63" r="4" fill="#6b7280"/>
-        <circle cx="22" cy="63" r="8" fill="#1f2937" stroke="#374151" stroke-width="2"/>
-        <circle cx="22" cy="63" r="4" fill="#6b7280"/>
-        <!-- Headlights -->
-        <circle cx="32" cy="45" r="3" fill="#fbbf24" opacity="0.9"/>
-        <circle cx="32" cy="53" r="3" fill="#fbbf24" opacity="0.9"/>
+      <!-- Exit Gate (right) -->
+      <g id="gateExit" class="gate" transform="translate(900,60)">
+        <rect class="gate-post" x="90" y="0" width="20" height="90" rx="4" />
+        <rect class="gate-bar" x="0" y="20" width="90" height="12" rx="3" />
+        <circle class="gate-light" cx="110" cy="-16" r="8" />
+        <text class="gate-label" x="50" y="60">EXIT</text>
       </g>
+
+      
     </svg>
-  </div>
-
-  <div class="legend">
-    <div>Sensor at 0 cm</div>
-    <div class="right" id="scaleLabel">Scale: 0–200 cm</div>
   </div>
 
   <small id="errorMsg">Could not fetch data. Retrying…</small>
 </div>
 
+<div class="card" style="margin-top: 18px; max-width: 900px; width: 100%;">
+  <h3 style="margin:0 0 10px 0; font-size: clamp(18px, 4vw, 20px); font-weight:600; color:#fff;">📈 Graphs</h3>
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">Customers Count</div>
+      <canvas id="chartCustomers" aria-label="Customers chart"></canvas>
+    </div>
+  </div>
+  <small style="color:#777; display:block; margin-top:8px;">Last 50 readings</small>
+  <button id="clearBtn" style="margin-top:10px; background:#242424; color:#e0e0e0; border:1px solid #333; padding:6px 14px; border-radius:6px; cursor:pointer; font-weight:500; font-size:13px;">Clear</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <script>
-const MAX_CM = 400; // fixed visualization range
-const TICK_EVERY = 20;
 
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
-}
+// ---- Charts state ----
+const MAX_HISTORY = 50;
+let customersHistory = [];
+let customersChart;
 
-function drawTicks(maxCm) {
-  const ticksGroup = document.getElementById('ticks');
-  if (!ticksGroup) return;
-  ticksGroup.innerHTML = '';
-  const START_X = 120; // safe start after sensor
-  const END_X = 1050;  // matches ground line end with padding
-  const USABLE_WIDTH = END_X - START_X;
-  const baselineY = 210;
-  for (let cm = 0; cm <= maxCm; cm += TICK_EVERY) {
-    const x = START_X + (cm / maxCm) * USABLE_WIDTH;
-    const isMajor = cm % 100 === 0;
-    const tickLen = isMajor ? 18 : 10;
-    const opacity = isMajor ? 0.65 : 0.35;
-    const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    tick.setAttribute('x1', String(x));
-    tick.setAttribute('y1', String(baselineY));
-    tick.setAttribute('x2', String(x));
-    tick.setAttribute('y2', String(baselineY - tickLen));
-    tick.setAttribute('stroke', `rgba(255,255,255,${opacity})`);
-    tick.setAttribute('stroke-width', '2');
-    ticksGroup.appendChild(tick);
-    if (isMajor) {
-      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      label.setAttribute('x', String(x));
-      label.setAttribute('y', String(baselineY - tickLen - 8));
-      label.setAttribute('text-anchor', 'middle');
-      label.setAttribute('fill', 'rgba(255,255,255,0.7)');
-      label.setAttribute('font-size', '14');
-      label.setAttribute('font-weight', '500');
-      label.textContent = String(cm);
-      ticksGroup.appendChild(label);
-    }
+function createOrUpdateChart(chartRef, canvasId, label, labels, data, color, yBounds) {
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return chartRef;
+  if (!chartRef) {
+    return new Chart(ctx, {
+      type: 'line',
+      data: { labels, datasets: [{ label, data, borderColor: color, backgroundColor: color + '33', tension: 0.25, fill: true, pointRadius: 0, borderWidth: 2 }] },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { display: false }, tooltip: { enabled: true } },
+        scales: {
+          x: { ticks: { color: '#aaa', maxRotation: 0, autoSkip: true }, grid: { color: 'rgba(255,255,255,0.06)' } },
+          y: { ticks: { color: '#aaa' }, grid: { color: 'rgba(255,255,255,0.06)' }, min: yBounds?.min, max: yBounds?.max, suggestedMin: yBounds?.suggestedMin, suggestedMax: yBounds?.suggestedMax }
+        }
+      }
+    });
+  } else {
+    chartRef.data.labels = labels;
+    chartRef.data.datasets[0].data = data;
+    chartRef.update('none');
+    return chartRef;
   }
 }
 
-function positionObject(distanceCm) {
-  const object = document.getElementById('object');
-  const label = document.getElementById('distanceVal');
-  const clamped = clamp(distanceCm, 0, MAX_CM);
-  label.textContent = distanceCm.toFixed(1) + ' cm';
-  // Precise mapping matching tick coordinates
-  const START_X = 120;
-  const END_X = 1050;
-  const USABLE_WIDTH = END_X - START_X;
-  const x = START_X + (clamped / MAX_CM) * USABLE_WIDTH;
-  object.setAttribute('transform', `translate(${x},150)`);
+function pushHistory(list, value) {
+  const ts = new Date();
+  list.push({ t: ts, v: value });
+  if (list.length > MAX_HISTORY) list.shift();
 }
 
-// Initial setup
-drawTicks(MAX_CM);
-document.getElementById('scaleLabel').textContent = `Scale: 0–${MAX_CM} cm`;
+function renderCharts() {
+  const custLabels = customersHistory.map(i => i.t.toLocaleTimeString());
+  const custData = customersHistory.map(i => i.v);
+  customersChart = createOrUpdateChart(customersChart, 'chartCustomers', 'Customers', custLabels, custData, '#ffb74d', { min: 0, suggestedMax: Math.max(5, Math.ceil((Math.max(0, ...custData) + 1) / 5) * 5) });
+}
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  customersHistory = [];
+  renderCharts();
+});
+
+// ---- Gate pulse helpers ----
+function pulseGate(which) {
+  const entry = document.getElementById('gateEntry');
+  const exit = document.getElementById('gateExit');
+  if (which === 'entry' && entry) {
+    entry.classList.add('gate-entry-active', 'blink');
+    setTimeout(() => entry.classList.remove('gate-entry-active', 'blink'), 900);
+  } else if (which === 'exit' && exit) {
+    exit.classList.add('gate-exit-active', 'blink');
+    setTimeout(() => exit.classList.remove('gate-exit-active', 'blink'), 900);
+  }
+}
+
+// Initial setup: no distance scale
 
 // ---- MQTT (HiveMQ Cloud over WebSockets) ----
 const MQTT_URL = 'wss://c047bd013b954dfd8ac40154210890bf.s1.eu.hivemq.cloud:8884/mqtt';
@@ -286,7 +316,8 @@ const MQTT_OPTIONS = {
   protocolVersion: 4
 };
 
-const DISTANCE_TOPIC = 'iot/bin/distance';
+const CUSTOMERS_TOPIC = 'iot/store/customers';
+const EVENT_TOPIC = 'iot/store/event';
 const err = document.getElementById('errorMsg');
 if (err) { err.textContent = 'Connecting to MQTT…'; err.style.display = 'inline'; }
 
@@ -300,7 +331,7 @@ try {
 if (client) {
   client.on('connect', () => {
     if (err) err.style.display = 'none';
-    client.subscribe(DISTANCE_TOPIC, (subErr) => {
+    client.subscribe([CUSTOMERS_TOPIC, EVENT_TOPIC], (subErr) => {
       if (subErr && err) {
         err.textContent = 'MQTT subscribe failed. Retrying…';
         err.style.display = 'inline';
@@ -321,11 +352,22 @@ if (client) {
   });
 
   client.on('message', (topic, payload) => {
-    if (topic !== DISTANCE_TOPIC) return;
     const text = payload ? payload.toString() : '';
-    const num = Number(text);
-    if (!Number.isFinite(num)) return;
-    positionObject(num);
+    if (topic === CUSTOMERS_TOPIC) {
+      const count = Math.max(0, parseInt(text, 10));
+      if (!Number.isFinite(count)) return;
+      const el = document.getElementById('customerVal');
+      if (el) el.textContent = String(count);
+      pushHistory(customersHistory, count);
+      renderCharts();
+      return;
+    }
+    if (topic === EVENT_TOPIC) {
+      const evt = text.trim().toLowerCase();
+      if (evt === 'entry') pulseGate('entry');
+      else if (evt === 'exit') pulseGate('exit');
+      return;
+    }
   });
 }
 </script>
