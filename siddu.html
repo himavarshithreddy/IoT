@@ -363,11 +363,16 @@
   @media (min-width: 960px) {
     body {
       display: grid;
-      grid-template-columns: 30% 70%;
+      grid-template-columns: 15% 30% 10% 30% 15%;
       gap: 20px;
       align-items: start;
       justify-content: center;
       padding: 40px;
+      text-align: left;
+    }
+
+    h2, .subtitle {
+      grid-column: 1 / -1;
       text-align: left;
     }
 
@@ -381,6 +386,10 @@
       width: 100%;
       text-align: left;
     }
+
+    /* Place values (card) and suggestions (smart-section) */
+    .card { grid-column: 2; }
+    .smart-section { grid-column: 4; }
 
     /* Make graphs container full width */
     #historySection {
