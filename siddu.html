@@ -358,6 +358,36 @@
     width: 100% !important;
     height: 180px !important;
   }
+
+  /* Desktop layout */
+  @media (min-width: 960px) {
+    body {
+      display: grid;
+      grid-template-columns: minmax(360px, 700px) minmax(300px, 420px);
+      gap: 20px;
+      align-items: start;
+      justify-content: center;
+      padding: 40px;
+      text-align: left;
+    }
+
+    h2, .subtitle {
+      grid-column: 1 / -1;
+      text-align: left;
+    }
+
+    .card, .smart-section, #historySection {
+      max-width: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+  }
 </style>
 </head>
 <body>
