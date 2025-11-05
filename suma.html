@@ -482,9 +482,11 @@ function resizeGatesForMobile() {
   if (!entryGate || !exitGate) return;
 
   if (isMobile) {
-    // Simple, predictable positions to ensure both are visible
-    entryGate.setAttribute('transform', 'translate(120,40) scale(1.15)');
-    exitGate.setAttribute('transform', 'translate(740,40) scale(1.15)');
+    // Keep both groups inside the 0..1100 viewBox
+    // Entry group minX ≈ 200 → shift down a bit only
+    entryGate.setAttribute('transform', 'translate(0,40) scale(1.15)');
+    // Exit group minX ≈ 705 → shift left into view
+    exitGate.setAttribute('transform', 'translate(-300,40) scale(1.15)');
   } else {
     // Desktop - no transforms, use original x/y coordinates
     entryGate.removeAttribute('transform');
