@@ -462,7 +462,7 @@ function formatTime(iso) {
 
 let tempChart, humChart, lightChart;
 
-function createOrUpdateChart(chartRef, canvasId, label, labels, data, color) {
+function createOrUpdateChart(chartRef, canvasId, label, labels, data, color, yBounds) {
   const ctx = document.getElementById(canvasId);
   if (!ctx) return chartRef;
   if (!chartRef) {
@@ -477,7 +477,9 @@ function createOrUpdateChart(chartRef, canvasId, label, labels, data, color) {
           backgroundColor: color + '33',
           tension: 0.25,
           fill: true,
-          pointRadius: 0,
+          pointRadius: 2,
+          pointHoverRadius: 4,
+          spanGaps: true,
           borderWidth: 2
         }]
       },
@@ -496,7 +498,11 @@ function createOrUpdateChart(chartRef, canvasId, label, labels, data, color) {
           },
           y: {
             ticks: { color: '#aaa' },
-            grid: { color: 'rgba(255,255,255,0.06)' }
+            grid: { color: 'rgba(255,255,255,0.06)' },
+            min: yBounds?.min,
+            max: yBounds?.max,
+            suggestedMin: yBounds?.suggestedMin,
+            suggestedMax: yBounds?.suggestedMax
           }
         }
       }
@@ -523,8 +529,8 @@ function renderHistory(list) {
   const lights = chronological.map(i => i.light ?? null);
 
   tempChart = createOrUpdateChart(tempChart, 'chartTemp', 'Temperature', labels, temps, '#ffb74d');
-  humChart = createOrUpdateChart(humChart, 'chartHum', 'Humidity', labels, hums, '#64b5f6');
-  lightChart = createOrUpdateChart(lightChart, 'chartLight', 'Light', labels, lights, '#ffd54f');
+  humChart = createOrUpdateChart(humChart, 'chartHum', 'Humidity', labels, hums, '#64b5f6', { suggestedMin: 0, suggestedMax: 100 });
+  lightChart = createOrUpdateChart(lightChart, 'chartLight', 'Light', labels, lights, '#ffd54f', { min: 0, max: 100 });
 }
 
 document.getElementById('clearHistoryBtn').addEventListener('click', () => {
