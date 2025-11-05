@@ -526,7 +526,15 @@ function renderHistory(list) {
   });
   const temps = chronological.map(i => i.temperature);
   const hums = chronological.map(i => i.humidity);
-  const lights = chronological.map(i => i.light ?? null);
+  const lightsRaw = chronological.map(i => (i.light === undefined || i.light === null) ? null : i.light);
+  const lights = lightsRaw.slice();
+  const firstLightIdx = lights.findIndex(v => v !== null);
+  if (firstLightIdx !== -1) {
+    for (let i = 0; i < firstLightIdx; i++) lights[i] = lights[firstLightIdx];
+    for (let i = firstLightIdx + 1; i < lights.length; i++) {
+      if (lights[i] === null) lights[i] = lights[i - 1];
+    }
+  }
 
   tempChart = createOrUpdateChart(tempChart, 'chartTemp', 'Temperature', labels, temps, '#ffb74d');
   humChart = createOrUpdateChart(humChart, 'chartHum', 'Humidity', labels, hums, '#64b5f6', { suggestedMin: 0, suggestedMax: 100 });
