@@ -486,11 +486,11 @@ function resizeGatesForMobile() {
   if (isMobile) {
     // Adjust viewBox to show both gates side-by-side
     svg.setAttribute('viewBox', '0 0 900 280');
-    // Move gates closer together horizontally
+    // Move gates closer together horizontally with proper spacing
     // Entry gate: original is at x=200-395, keep it
     entryGate.setAttribute('transform', 'translate(0,20) scale(0.95)');
-    // Exit gate: original is at x=705-900, move it left by 300px to x=405-600
-    exitGate.setAttribute('transform', 'translate(-300,20) scale(0.95)');
+    // Exit gate: original is at x=705-900, move it left by 250px to x=455-650 (60px gap)
+    exitGate.setAttribute('transform', 'translate(-250,20) scale(0.95)');
   } else {
     // Desktop - reset viewBox and transforms
     svg.setAttribute('viewBox', '0 0 1100 240');
