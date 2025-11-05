@@ -479,16 +479,29 @@ function resizeGatesForMobile() {
   const isMobile = window.innerWidth <= 480;
   const entryGate = document.getElementById('gateEntry');
   const exitGate = document.getElementById('gateExit');
-  if (!entryGate || !exitGate) return;
+  const svg = document.getElementById('scaleSvg');
+  if (!entryGate || !exitGate || !svg) return;
 
   if (isMobile) {
-    // Keep both groups inside the 0..1100 viewBox
-    // Entry group minX ≈ 200 → shift down a bit only
-    entryGate.setAttribute('transform', 'translate(0,40) scale(1.15)');
-    // Exit group minX ≈ 705 → shift left into view
-    exitGate.setAttribute('transform', 'translate(-300,40) scale(1.15)');
+    // Stack vertically: center each gate horizontally in the 1100-wide viewBox
+    const viewBoxWidth = 1100;
+    const scale = 1.15;
+
+    const eb = entryGate.getBBox();
+    const xbEntryCenter = eb.x + eb.width / 2;
+    const dxEntry = (viewBoxWidth / 2) - xbEntryCenter;
+    // Place entry near top (y target ~ 40)
+    const dyEntry = 40 - eb.y;
+    entryGate.setAttribute('transform', `translate(${dxEntry}, ${dyEntry}) scale(${scale})`);
+
+    const xb = exitGate.getBBox();
+    const xbExitCenter = xb.x + xb.width / 2;
+    const dxExit = (viewBoxWidth / 2) - xbExitCenter;
+    // Place exit lower (y target ~ 160)
+    const dyExit = 160 - xb.y;
+    exitGate.setAttribute('transform', `translate(${dxExit}, ${dyExit}) scale(${scale})`);
   } else {
-    // Desktop - no transforms, use original x/y coordinates
+    // Desktop - reset transforms to use original coordinates
     entryGate.removeAttribute('transform');
     exitGate.removeAttribute('transform');
   }
