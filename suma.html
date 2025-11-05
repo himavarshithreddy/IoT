@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Distance Sensor Visualization</title>
+<title>Smart Store Customer Counter</title>
 <style>
   * {
     margin: 0;
@@ -132,11 +132,12 @@
   .gate-entry-active .gate-light { fill: #34d399; }
   .gate-exit-active .gate-light { fill: #f59e0b; }
   .blink {
-    animation: blinkPulse 900ms ease-out 1;
+    animation: blinkPulse 2000ms ease-out 1;
   }
   @keyframes blinkPulse {
     0% { opacity: 0.3; transform: scale(0.9); }
-    40% { opacity: 1; transform: scale(1.05); }
+    25% { opacity: 1; transform: scale(1.08); }
+    60% { opacity: 1; transform: scale(1.05); }
     100% { opacity: 1; transform: scale(1); }
   }
 
@@ -188,7 +189,7 @@
 </head>
 <body>
 
-<h2>📏 Distance Sensor</h2>
+<h2>🏪 Smart Store Customer Counter</h2>
 
 <div class="subtitle">Sumanaswi Akkisetty, RA2211026010158</div>
 
@@ -201,24 +202,22 @@
   </div>
 
   <div id="scaleWrap" class="viz" aria-label="Gate visualization">
-    <svg id="scaleSvg" viewBox="0 0 1100 180" preserveAspectRatio="xMidYMid meet">
+    <svg id="scaleSvg" viewBox="0 0 1100 240" preserveAspectRatio="xMidYMid meet">
       <!-- Entry Gate (left) -->
-      <g id="gateEntry" class="gate" transform="translate(180,60)">
-        <rect class="gate-post" x="-10" y="0" width="20" height="90" rx="4" />
-        <rect class="gate-bar" x="10" y="20" width="90" height="12" rx="3" />
-        <circle class="gate-light" cx="0" cy="-16" r="8" />
-        <text class="gate-label" x="50" y="60">ENTRY</text>
+      <g id="gateEntry" class="gate">
+        <rect class="gate-post" x="200" y="50" width="35" height="140" rx="6" />
+        <rect class="gate-bar" x="235" y="100" width="160" height="20" rx="5" />
+        <circle class="gate-light" cx="218" cy="25" r="16" />
+        <text class="gate-label" x="315" y="175">ENTRY</text>
       </g>
 
       <!-- Exit Gate (right) -->
-      <g id="gateExit" class="gate" transform="translate(900,60)">
-        <rect class="gate-post" x="90" y="0" width="20" height="90" rx="4" />
-        <rect class="gate-bar" x="0" y="20" width="90" height="12" rx="3" />
-        <circle class="gate-light" cx="110" cy="-16" r="8" />
-        <text class="gate-label" x="50" y="60">EXIT</text>
+      <g id="gateExit" class="gate">
+        <rect class="gate-post" x="865" y="50" width="35" height="140" rx="6" />
+        <rect class="gate-bar" x="705" y="100" width="160" height="20" rx="5" />
+        <circle class="gate-light" cx="882" cy="25" r="16" />
+        <text class="gate-label" x="785" y="175">EXIT</text>
       </g>
-
-      
     </svg>
   </div>
 
@@ -232,6 +231,10 @@
       <div class="chart-title">Customers Count</div>
       <canvas id="chartCustomers" aria-label="Customers chart"></canvas>
     </div>
+    <div class="chart-card">
+      <div class="chart-title">Entry/Exit Events Timeline</div>
+      <canvas id="chartEvents" aria-label="Events timeline chart"></canvas>
+    </div>
   </div>
   <small style="color:#777; display:block; margin-top:8px;">Last 50 readings</small>
   <button id="clearBtn" style="margin-top:10px; background:#242424; color:#e0e0e0; border:1px solid #333; padding:6px 14px; border-radius:6px; cursor:pointer; font-weight:500; font-size:13px;">Clear</button>
@@ -244,7 +247,8 @@
 // ---- Charts state ----
 const MAX_HISTORY = 50;
 let customersHistory = [];
-let customersChart;
+let eventsHistory = [];
+let customersChart, eventsChart;
 
 function createOrUpdateChart(chartRef, canvasId, label, labels, data, color, yBounds) {
   const ctx = document.getElementById(canvasId);
@@ -282,10 +286,16 @@ function renderCharts() {
   const custLabels = customersHistory.map(i => i.t.toLocaleTimeString());
   const custData = customersHistory.map(i => i.v);
   customersChart = createOrUpdateChart(customersChart, 'chartCustomers', 'Customers', custLabels, custData, '#ffb74d', { min: 0, suggestedMax: Math.max(5, Math.ceil((Math.max(0, ...custData) + 1) / 5) * 5) });
+
+  // Events chart: map entry=1, exit=-1
+  const eventLabels = eventsHistory.map(i => i.t.toLocaleTimeString());
+  const eventData = eventsHistory.map(i => i.v === 'entry' ? 1 : (i.v === 'exit' ? -1 : 0));
+  eventsChart = createOrUpdateChart(eventsChart, 'chartEvents', 'Events', eventLabels, eventData, '#34d399', { min: -1.5, max: 1.5, ticks: { callback: v => v === 1 ? 'Entry' : (v === -1 ? 'Exit' : '') } });
 }
 
 document.getElementById('clearBtn').addEventListener('click', () => {
   customersHistory = [];
+  eventsHistory = [];
   renderCharts();
 });
 
@@ -295,10 +305,10 @@ function pulseGate(which) {
   const exit = document.getElementById('gateExit');
   if (which === 'entry' && entry) {
     entry.classList.add('gate-entry-active', 'blink');
-    setTimeout(() => entry.classList.remove('gate-entry-active', 'blink'), 900);
+    setTimeout(() => entry.classList.remove('gate-entry-active', 'blink'), 2000);
   } else if (which === 'exit' && exit) {
     exit.classList.add('gate-exit-active', 'blink');
-    setTimeout(() => exit.classList.remove('gate-exit-active', 'blink'), 900);
+    setTimeout(() => exit.classList.remove('gate-exit-active', 'blink'), 2000);
   }
 }
 
@@ -364,8 +374,15 @@ if (client) {
     }
     if (topic === EVENT_TOPIC) {
       const evt = text.trim().toLowerCase();
-      if (evt === 'entry') pulseGate('entry');
-      else if (evt === 'exit') pulseGate('exit');
+      if (evt === 'entry') {
+        pulseGate('entry');
+        pushHistory(eventsHistory, 'entry');
+        renderCharts();
+      } else if (evt === 'exit') {
+        pulseGate('exit');
+        pushHistory(eventsHistory, 'exit');
+        renderCharts();
+      }
       return;
     }
   });
