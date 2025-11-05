@@ -220,21 +220,21 @@
   </div>
 
   <div id="scaleWrap" class="viz" aria-label="Gate visualization">
-    <svg id="scaleSvg" viewBox="0 0 1100 240" preserveAspectRatio="xMidYMid meet">
+    <svg id="scaleSvg" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet">
       <!-- Entry Gate (left) -->
       <g id="gateEntry" class="gate">
-        <rect class="gate-post" x="200" y="50" width="35" height="140" rx="6" />
-        <rect class="gate-bar" x="235" y="100" width="160" height="20" rx="5" />
-        <circle class="gate-light" cx="218" cy="25" r="16" />
-        <text class="gate-label" x="315" y="175">ENTRY</text>
+        <rect class="gate-post" x="80" y="40" width="30" height="120" rx="5" />
+        <rect class="gate-bar" x="110" y="80" width="120" height="16" rx="4" />
+        <circle class="gate-light" cx="95" cy="20" r="12" />
+        <text class="gate-label" x="170" y="145">ENTRY</text>
       </g>
 
       <!-- Exit Gate (right) -->
       <g id="gateExit" class="gate">
-        <rect class="gate-post" x="865" y="50" width="35" height="140" rx="6" />
-        <rect class="gate-bar" x="705" y="100" width="160" height="20" rx="5" />
-        <circle class="gate-light" cx="882" cy="25" r="16" />
-        <text class="gate-label" x="785" y="175">EXIT</text>
+        <rect class="gate-post" x="490" y="40" width="30" height="120" rx="5" />
+        <rect class="gate-bar" x="370" y="80" width="120" height="16" rx="4" />
+        <circle class="gate-light" cx="505" cy="20" r="12" />
+        <text class="gate-label" x="430" y="145">EXIT</text>
       </g>
     </svg>
   </div>
@@ -474,36 +474,7 @@ if (client) {
 // Initial render of charts
 renderCharts();
 
-// Resize gates on mobile
-function resizeGatesForMobile() {
-  const isMobile = window.innerWidth <= 480;
-  const entryGate = document.getElementById('gateEntry');
-  const exitGate = document.getElementById('gateExit');
-  const svg = document.getElementById('scaleSvg');
-
-  if (!entryGate || !exitGate || !svg) return;
-
-  if (isMobile) {
-    // Center both gates in the viewBox with good spacing
-    svg.setAttribute('viewBox', '0 0 900 280');
-    // Entry gate: original at x=200-395, move to center-left (x=180-375)
-    entryGate.setAttribute('transform', 'translate(-20,30) scale(0.9)');
-    // Exit gate: original at x=705-900, move much closer to center-right (x=525-720)
-    // This gives us ~150px gap between gates and centers them in the 900px viewBox
-    exitGate.setAttribute('transform', 'translate(-180,30) scale(0.9)');
-  } else {
-    // Desktop - reset viewBox and transforms
-    svg.setAttribute('viewBox', '0 0 1100 240');
-    entryGate.removeAttribute('transform');
-    exitGate.removeAttribute('transform');
-  }
-}
-
-// Use setTimeout to ensure SVG is rendered before getting bounding boxes
-setTimeout(() => {
-  window.addEventListener('resize', resizeGatesForMobile);
-  resizeGatesForMobile();
-}, 100);
+// No resize needed - gates are now positioned correctly in the 600px viewBox
 </script>
 
 </body>
