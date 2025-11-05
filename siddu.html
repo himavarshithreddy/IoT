@@ -363,7 +363,7 @@
   @media (min-width: 960px) {
     body {
       display: grid;
-      grid-template-columns: 15% 30% 10% 30% 15%;
+      grid-template-columns: 10% 35% 10% 35% 10%;
       gap: 20px;
       align-items: start;
       justify-content: center;
@@ -372,13 +372,8 @@
     }
 
     h2, .subtitle {
-      grid-column: 1 / -1;
-      text-align: left;
-    }
-
-    h2, .subtitle {
-      grid-column: 1 / -1;
-      text-align: left;
+      grid-column: 2 / 5;
+      text-align: center;
     }
 
     .card, .smart-section, #historySection {
@@ -394,6 +389,8 @@
     /* Make graphs container full width */
     #historySection {
       grid-column: 1 / -1;
+      margin-left: 5%;
+      margin-right: 5%;
     }
 
     .charts-grid {
