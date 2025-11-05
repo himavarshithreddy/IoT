@@ -363,7 +363,7 @@
   @media (min-width: 960px) {
     body {
       display: grid;
-      grid-template-columns: minmax(360px, 700px) minmax(300px, 420px);
+      grid-template-columns: 30% 70%;
       gap: 20px;
       align-items: start;
       justify-content: center;
@@ -380,6 +380,11 @@
       max-width: none;
       width: 100%;
       text-align: left;
+    }
+
+    /* Make graphs container full width */
+    #historySection {
+      grid-column: 1 / -1;
     }
 
     .charts-grid {
