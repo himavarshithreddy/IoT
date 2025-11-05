@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Distance Sensor Visualization</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    background: #0a0a0a;
+    min-height: 100vh;
+    color: #e0e0e0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 15px;
+  }
+  
+  h2 {
+    font-size: clamp(22px, 5vw, 28px);
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #ffffff;
+    text-align: center;
+  }
+  
+  .subtitle {
+    margin-top: 8px;
+    margin-bottom: 25px;
+    font-size: clamp(12px, 3vw, 14px);
+    font-weight: 500;
+    color: #ffffff;
+    text-align: center;
+  }
+  
+  .card {
+    background: #1a1a1a;
+    padding: clamp(20px, 5vw, 30px);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 900px;
+    text-align: center;
+    border: 1px solid #2a2a2a;
+  }
+  
+  .sensor-item {
+    background: #242424;
+    padding: clamp(16px, 4vw, 20px);
+    border-radius: 8px;
+    margin: 12px 0;
+    border: 1px solid #333;
+  }
+  
+  .sensor-item p {
+    font-size: clamp(12px, 3vw, 14px);
+    margin-bottom: 8px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+  }
+  
+  .value {
+    font-size: clamp(32px, 8vw, 42px);
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -1px;
+  }
+
+  .viz {
+    margin-top: 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    overflow: visible;
+    padding: clamp(8px, 2vw, 12px);
+  }
+  #scaleWrap {
+    width: 100%;
+    height: clamp(200px, 35vw, 280px);
+  }
+  #scaleSvg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+  }
+  
+  /* Object styling */
+  .object {
+    transition: transform 520ms ease;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+  }
+  
+  .legend {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    color: #aaa;
+    font-size: clamp(11px, 2.5vw, 13px);
+  }
+  .legend .right { text-align: right; }
+
+  #errorMsg {
+    display: none;
+    margin-top: 10px;
+    font-size: clamp(11px, 2.5vw, 13px);
+    color: #ff6b6b;
+    background: #2a1a1a;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 500;
+    border: 1px solid #3a2020;
+  }
+
+  /* Mobile tweaks */
+  @media (max-width: 768px) {
+    body { padding: 20px 10px; }
+    .card { 
+      border-radius: 10px;
+      padding: clamp(16px, 4vw, 24px);
+    }
+    .viz {
+      padding: clamp(6px, 1.5vw, 10px);
+    }
+    #scaleWrap {
+      height: clamp(160px, 40vw, 240px);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    h2 { font-size: clamp(20px, 6vw, 24px); }
+    .subtitle { font-size: clamp(11px, 3vw, 13px); }
+    #scaleWrap {
+      height: clamp(140px, 45vw, 200px);
+    }
+  }
+</style>
+</head>
+<body>
+
+<h2>📏 Distance Sensor</h2>
+
+<div class="subtitle">Sumanaswi Akkisetty, RA2211026010158</div>
+
+<div class="card">
+  <div class="sensor-item">
+    <p>Distance</p>
+    <div id="distanceVal" class="value">-- cm</div>
+  </div>
+
+  <div id="scaleWrap" class="viz" aria-label="Distance visualization">
+    <svg id="scaleSvg" viewBox="0 0 1100 280" preserveAspectRatio="xMidYMid meet">
+      <!-- Background grid (blended) -->
+      <defs>
+        <pattern id="smallGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        </pattern>
+        <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
+          <rect width="100" height="100" fill="url(#smallGrid)"/>
+          <path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="1"/>
+        </pattern>
+      </defs>
+      <rect x="0" y="0" width="1100" height="280" fill="url(#grid)" />
+
+      <!-- Ground line -->
+      <line x1="50" y1="210" x2="1050" y2="210" stroke="#3a3a3a" stroke-width="3" />
+
+      <!-- Sensor base (fixed at left) -->
+      <g id="sensor" transform="translate(90,155)">
+        <rect x="-20" y="0" width="40" height="55" rx="6" fill="#2f2f2f" stroke="#555"/>
+        <rect x="-14" y="6" width="28" height="18" rx="3" fill="#0e7c7b" />
+        <circle cx="0" cy="36" r="6" fill="#888" />
+        <rect x="-6" y="44" width="12" height="6" rx="2" fill="#aaa" />
+      </g>
+
+      <!-- Ticks and labels (0..MAX_CM) -->
+      <g id="ticks"></g>
+
+      <!-- Object that moves with distance - Car -->
+      <g id="object" class="object" transform="translate(120,150)">
+        <!-- Car body -->
+        <rect x="-35" y="35" width="70" height="28" rx="4" fill="#3b82f6" stroke="#2563eb" stroke-width="2"/>
+        <!-- Car roof/cabin -->
+        <path d="M -20 35 L -15 20 L 15 20 L 20 35 Z" fill="#2563eb" stroke="#1e40af" stroke-width="1.5"/>
+        <!-- Windows -->
+        <rect x="-18" y="23" width="15" height="10" rx="2" fill="rgba(255,255,255,0.3)"/>
+        <rect x="3" y="23" width="15" height="10" rx="2" fill="rgba(255,255,255,0.3)"/>
+        <!-- Wheels -->
+        <circle cx="-22" cy="63" r="8" fill="#1f2937" stroke="#374151" stroke-width="2"/>
+        <circle cx="-22" cy="63" r="4" fill="#6b7280"/>
+        <circle cx="22" cy="63" r="8" fill="#1f2937" stroke="#374151" stroke-width="2"/>
+        <circle cx="22" cy="63" r="4" fill="#6b7280"/>
+        <!-- Headlights -->
+        <circle cx="32" cy="45" r="3" fill="#fbbf24" opacity="0.9"/>
+        <circle cx="32" cy="53" r="3" fill="#fbbf24" opacity="0.9"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="legend">
+    <div>Sensor at 0 cm</div>
+    <div class="right" id="scaleLabel">Scale: 0–200 cm</div>
+  </div>
+
+  <small id="errorMsg">Could not fetch data. Retrying…</small>
+</div>
+
+<script>
+const url = 'https://690a61b31a446bb9cc226e5f.mockapi.io/api/distance';
+const MAX_CM = 400; // fixed visualization range
+const TICK_EVERY = 20;
+let inFlight = false;
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function drawTicks(maxCm) {
+  const ticksGroup = document.getElementById('ticks');
+  if (!ticksGroup) return;
+  ticksGroup.innerHTML = '';
+  const START_X = 120; // safe start after sensor
+  const END_X = 1050;  // matches ground line end with padding
+  const USABLE_WIDTH = END_X - START_X;
+  const baselineY = 210;
+  for (let cm = 0; cm <= maxCm; cm += TICK_EVERY) {
+    const x = START_X + (cm / maxCm) * USABLE_WIDTH;
+    const isMajor = cm % 100 === 0;
+    const tickLen = isMajor ? 18 : 10;
+    const opacity = isMajor ? 0.65 : 0.35;
+    const tick = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    tick.setAttribute('x1', String(x));
+    tick.setAttribute('y1', String(baselineY));
+    tick.setAttribute('x2', String(x));
+    tick.setAttribute('y2', String(baselineY - tickLen));
+    tick.setAttribute('stroke', `rgba(255,255,255,${opacity})`);
+    tick.setAttribute('stroke-width', '2');
+    ticksGroup.appendChild(tick);
+    if (isMajor) {
+      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      label.setAttribute('x', String(x));
+      label.setAttribute('y', String(baselineY - tickLen - 8));
+      label.setAttribute('text-anchor', 'middle');
+      label.setAttribute('fill', 'rgba(255,255,255,0.7)');
+      label.setAttribute('font-size', '14');
+      label.setAttribute('font-weight', '500');
+      label.textContent = String(cm);
+      ticksGroup.appendChild(label);
+    }
+  }
+}
+
+function positionObject(distanceCm) {
+  const object = document.getElementById('object');
+  const label = document.getElementById('distanceVal');
+  const clamped = clamp(distanceCm, 0, MAX_CM);
+  label.textContent = distanceCm.toFixed(1) + ' cm';
+  // Precise mapping matching tick coordinates
+  const START_X = 120;
+  const END_X = 1050;
+  const USABLE_WIDTH = END_X - START_X;
+  const x = START_X + (clamped / MAX_CM) * USABLE_WIDTH;
+  object.setAttribute('transform', `translate(${x},150)`);
+}
+
+async function fetchDistance() {
+  if (inFlight) return;
+  inFlight = true;
+  const err = document.getElementById('errorMsg');
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (err) err.style.display = 'none';
+    const record = Array.isArray(data) ? data[data.length - 1] : data;
+    if (!record || record.distance_cm === undefined || record.distance_cm === null) return;
+    const dist = Number(record.distance_cm);
+    if (Number.isFinite(dist)) positionObject(dist);
+  } catch (e) {
+    if (err) err.style.display = 'inline';
+  } finally {
+    inFlight = false;
+  }
+}
+
+// Initial setup
+drawTicks(MAX_CM);
+document.getElementById('scaleLabel').textContent = `Scale: 0–${MAX_CM} cm`;
+fetchDistance();
+setInterval(fetchDistance, 1500);
+</script>
+
+</body>
+</html>
+
+
