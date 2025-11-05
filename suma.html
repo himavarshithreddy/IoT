@@ -312,32 +312,56 @@ function pushHistory(list, value) {
 }
 
 function renderCharts() {
+  // Customers chart
   const custLabels = customersHistory.map(i => i.t.toLocaleTimeString());
   const custData = customersHistory.map(i => i.v);
-  customersChart = createOrUpdateChart(customersChart, 'chartCustomers', 'Customers', custLabels, custData, '#3b82f6', { min: 0, suggestedMax: Math.max(5, Math.ceil((Math.max(0, ...custData) + 1) / 5) * 5) });
+  customersChart = createOrUpdateChart(
+    customersChart,
+    'chartCustomers',
+    'Customers',
+    custLabels,
+    custData,
+    '#3b82f6',
+    { min: 0, suggestedMax: Math.max(5, Math.ceil((Math.max(0, ...custData) + 1) / 5) * 5) }
+  );
 
-  // Traffic rate chart: entries and exits per minute
-  const trafficLabels = trafficRateData.map(i => i.t.toLocaleTimeString());
-  const entriesData = trafficRateData.map(i => i.entries);
-  const exitsData = trafficRateData.map(i => i.exits);
+  // Traffic rate chart: include a live bucket for the current minute so we see updates immediately
+  const nowBucket = { t: new Date(), entries: currentMinuteEntries, exits: currentMinuteExits };
+  const series = [...trafficRateData.slice(-MAX_HISTORY + 1), nowBucket];
+  const trafficLabels = series.map(i => i.t.toLocaleTimeString());
+  const entriesData = series.map(i => i.entries);
+  const exitsData = series.map(i => i.exits);
+
+  const suggestedTop = Math.max(5, Math.ceil((Math.max(0, ...entriesData, ...exitsData) + 1) / 5) * 5);
   const trafficDatasets = [
     { label: 'Entries', data: entriesData, borderColor: '#10b981', backgroundColor: '#10b98133', tension: 0.4, fill: true, pointRadius: 0, borderWidth: 3 },
     { label: 'Exits', data: exitsData, borderColor: '#f59e0b', backgroundColor: '#f59e0b33', tension: 0.4, fill: true, pointRadius: 0, borderWidth: 3 }
   ];
-  
-  // Ensure we have data or provide empty arrays
-  if (trafficRateData.length === 0) {
-    trafficDatasets[0].data = [0];
-    trafficDatasets[1].data = [0];
-    trafficLabels.push(new Date().toLocaleTimeString());
-  }
-  
-  trafficChart = createOrUpdateChart(trafficChart, 'chartTraffic', 'Traffic', trafficLabels.length > 0 ? trafficLabels : [new Date().toLocaleTimeString()], null, null, { min: 0, suggestedMax: 5 }, trafficDatasets);
+
+  trafficChart = createOrUpdateChart(
+    trafficChart,
+    'chartTraffic',
+    'Traffic',
+    trafficLabels.length ? trafficLabels : [new Date().toLocaleTimeString()],
+    null,
+    null,
+    { min: 0, suggestedMax: suggestedTop },
+    trafficDatasets
+  );
 }
 
 document.getElementById('clearBtn').addEventListener('click', () => {
   customersHistory = [];
   trafficRateData = [];
+  currentMinuteKey = '';
+  currentMinuteEntries = 0;
+  currentMinuteExits = 0;
+  totalEntriesToday = 0;
+  totalExitsToday = 0;
+  const te = document.getElementById('totalEntries');
+  const tx = document.getElementById('totalExits');
+  if (te) te.textContent = '0';
+  if (tx) tx.textContent = '0';
   renderCharts();
 });
 
