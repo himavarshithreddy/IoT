@@ -213,11 +213,10 @@
   <small id="errorMsg">Could not fetch data. Retrying…</small>
 </div>
 
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <script>
-const url = '/api/distance';
 const MAX_CM = 400; // fixed visualization range
 const TICK_EVERY = 20;
-let inFlight = false;
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -271,31 +270,64 @@ function positionObject(distanceCm) {
   object.setAttribute('transform', `translate(${x},150)`);
 }
 
-async function fetchDistance() {
-  if (inFlight) return;
-  inFlight = true;
-  const err = document.getElementById('errorMsg');
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    if (err) err.style.display = 'none';
-    const record = Array.isArray(data) ? data[data.length - 1] : data;
-    if (!record || record.distance_cm === undefined || record.distance_cm === null) return;
-    const dist = Number(record.distance_cm);
-    if (Number.isFinite(dist)) positionObject(dist);
-  } catch (e) {
-    if (err) err.style.display = 'inline';
-  } finally {
-    inFlight = false;
-  }
-}
-
 // Initial setup
 drawTicks(MAX_CM);
 document.getElementById('scaleLabel').textContent = `Scale: 0–${MAX_CM} cm`;
-fetchDistance();
-setInterval(fetchDistance, 1500);
+
+// ---- MQTT (HiveMQ Cloud over WebSockets) ----
+const MQTT_URL = 'wss://c047bd013b954dfd8ac40154210890bf.s1.eu.hivemq.cloud:8884/mqtt';
+const MQTT_OPTIONS = {
+  username: 'espuser',
+  password: 'Esp12345',
+  keepalive: 30,
+  clean: true,
+  reconnectPeriod: 1500,
+  connectTimeout: 8000,
+  protocolVersion: 4
+};
+
+const DISTANCE_TOPIC = 'iot/bin/distance';
+const err = document.getElementById('errorMsg');
+if (err) { err.textContent = 'Connecting to MQTT…'; err.style.display = 'inline'; }
+
+let client;
+try {
+  client = mqtt.connect(MQTT_URL, MQTT_OPTIONS);
+} catch (e) {
+  if (err) { err.textContent = 'Failed to init MQTT client.'; err.style.display = 'inline'; }
+}
+
+if (client) {
+  client.on('connect', () => {
+    if (err) err.style.display = 'none';
+    client.subscribe(DISTANCE_TOPIC, (subErr) => {
+      if (subErr && err) {
+        err.textContent = 'MQTT subscribe failed. Retrying…';
+        err.style.display = 'inline';
+      }
+    });
+  });
+
+  client.on('reconnect', () => {
+    if (err) { err.textContent = 'MQTT reconnecting…'; err.style.display = 'inline'; }
+  });
+
+  client.on('offline', () => {
+    if (err) { err.textContent = 'MQTT offline. Reconnecting…'; err.style.display = 'inline'; }
+  });
+
+  client.on('error', () => {
+    if (err) { err.textContent = 'MQTT error. Retrying…'; err.style.display = 'inline'; }
+  });
+
+  client.on('message', (topic, payload) => {
+    if (topic !== DISTANCE_TOPIC) return;
+    const text = payload ? payload.toString() : '';
+    const num = Number(text);
+    if (!Number.isFinite(num)) return;
+    positionObject(num);
+  });
+}
 </script>
 
 </body>
