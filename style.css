@@ -81,6 +81,72 @@ a + a {
   margin-left: 10px;
 }
 
+/* Home page components */
+.subtitle {
+  margin-top: 8px;
+  margin-bottom: 25px;
+  color: #ffffff;
+  font-weight: 500;
+  font-size: clamp(12px, 3vw, 14px);
+  text-align: center;
+}
+
+.card {
+  background: #1a1a1a;
+  padding: clamp(20px, 5vw, 30px);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 900px;
+  text-align: center;
+  border: 1px solid #2a2a2a;
+}
+
+.link-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: clamp(12px, 3vw, 16px);
+}
+
+.link-card {
+  display: block;
+  background: #242424;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: clamp(16px, 4vw, 20px);
+  color: #e0e0e0;
+  text-decoration: none;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease;
+}
+
+.link-card:hover {
+  background: #2a2a2a;
+  border-color: #444;
+  transform: translateY(-1px);
+}
+
+.link-card:active {
+  transform: scale(0.98);
+}
+
+.link-card .icon {
+  display: block;
+  font-size: clamp(22px, 5vw, 28px);
+  margin-bottom: 8px;
+}
+
+.link-card .title {
+  display: block;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: clamp(16px, 4vw, 18px);
+  margin-bottom: 6px;
+}
+
+.link-card small {
+  color: #888;
+  font-size: clamp(12px, 3vw, 13px);
+}
+
 /* Small screens: stack buttons and reduce padding */
 @media (max-width: 520px) {
   body {
