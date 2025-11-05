@@ -12,7 +12,7 @@
   }
   
   body {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
     min-height: 100vh;
     color: #e2e8f0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
@@ -26,7 +26,7 @@
     font-size: clamp(24px, 5vw, 32px);
     font-weight: 700;
     margin-bottom: 8px;
-    background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -43,23 +43,23 @@
   }
   
   .card {
-    background: rgba(30, 41, 59, 0.8);
+    background: rgba(26, 26, 46, 0.85);
     backdrop-filter: blur(10px);
     padding: clamp(24px, 5vw, 32px);
     border-radius: 24px;
     width: 100%;
     max-width: 900px;
     text-align: center;
-    border: 1px solid rgba(6, 182, 212, 0.2);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 60px rgba(6, 182, 212, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 60px rgba(168, 85, 247, 0.15);
   }
   
   .sensor-item {
-    background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
     padding: clamp(20px, 5vw, 28px);
     border-radius: 18px;
     margin: 12px 0;
-    border: 1px solid rgba(6, 182, 212, 0.3);
+    border: 1px solid rgba(168, 85, 247, 0.3);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -73,21 +73,21 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    color: #06b6d4;
+    color: #a855f7;
   }
   
   .value {
     font-size: clamp(36px, 8vw, 48px);
     font-weight: 700;
-    color: #06b6d4;
+    color: #a855f7;
     letter-spacing: -1px;
-    text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+    text-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
   }
 
   .viz {
     margin-top: 18px;
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(6, 182, 212, 0.3);
+    background: rgba(15, 15, 35, 0.6);
+    border: 1px solid rgba(168, 85, 247, 0.3);
     border-radius: 18px;
     overflow: visible;
     padding: clamp(12px, 3vw, 16px);
@@ -117,16 +117,16 @@
 
   /* Gates and event lights */
   .gate {
-    filter: drop-shadow(0 4px 12px rgba(6, 182, 212, 0.3));
+    filter: drop-shadow(0 4px 12px rgba(168, 85, 247, 0.4));
   }
   .gate-label {
     font-size: 15px;
     font-weight: 700;
-    fill: #06b6d4;
+    fill: #a855f7;
     text-anchor: middle;
   }
-  .gate-post { fill: #1e293b; stroke: #06b6d4; stroke-width: 3; }
-  .gate-bar  { fill: #334155; stroke: #06b6d4; stroke-width: 2; }
+  .gate-post { fill: #1e293b; stroke: #a855f7; stroke-width: 3; }
+  .gate-bar  { fill: #334155; stroke: #a855f7; stroke-width: 2; }
   .gate-light { fill: #475569; stroke: #64748b; stroke-width: 1; }
   .gate-entry-active .gate-light { fill: #10b981; stroke: #059669; stroke-width: 2; }
   .gate-exit-active .gate-light { fill: #f59e0b; stroke: #d97706; stroke-width: 2; }
@@ -148,17 +148,16 @@
     margin-top: 18px;
   }
   .chart-card {
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(15, 15, 35, 0.7);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(6, 182, 212, 0.3);
-    border-left: 4px solid #06b6d4;
+    border: 1px solid rgba(168, 85, 247, 0.3);
     border-radius: 18px;
-    padding: 16px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(6, 182, 212, 0.1);
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(168, 85, 247, 0.1);
   }
   .chart-title {
     font-size: clamp(12px, 3vw, 14px);
-    color: #06b6d4;
+    color: #a855f7;
     margin-bottom: 12px;
     text-transform: uppercase;
     letter-spacing: 0.8px;
@@ -180,7 +179,7 @@
       padding: clamp(10px, 2vw, 14px);
     }
     #scaleWrap {
-      height: clamp(180px, 40vw, 240px);
+      height: clamp(240px, 55vw, 320px);
     }
   }
   
@@ -191,8 +190,15 @@
       flex-direction: column;
       text-align: center;
     }
+    .sensor-item > div:first-child {
+      text-align: center !important;
+      width: 100%;
+    }
+    .value {
+      text-align: center;
+    }
     #scaleWrap {
-      height: clamp(160px, 45vw, 200px);
+      height: clamp(280px, 70vw, 360px);
     }
   }
 </style>
@@ -209,16 +215,16 @@
       <p>Current Customers</p>
       <div id="customerVal" class="value">0</div>
     </div>
-    <div style="display: flex; gap: 24px; align-items: center;">
-      <div style="text-align: center;">
-        <p style="font-size: 11px; margin-bottom: 4px;">Entries Today</p>
-        <div style="font-size: 24px; font-weight: 600; color: #10b981;" id="totalEntries">0</div>
+      <div style="display: flex; gap: 24px; align-items: center;">
+        <div style="text-align: center;">
+          <p style="font-size: 11px; margin-bottom: 4px; color: #94a3b8;">Entries Today</p>
+          <div style="font-size: 24px; font-weight: 600; color: #10b981;" id="totalEntries">0</div>
+        </div>
+        <div style="text-align: center;">
+          <p style="font-size: 11px; margin-bottom: 4px; color: #94a3b8;">Exits Today</p>
+          <div style="font-size: 24px; font-weight: 600; color: #f59e0b;" id="totalExits">0</div>
+        </div>
       </div>
-      <div style="text-align: center;">
-        <p style="font-size: 11px; margin-bottom: 4px;">Exits Today</p>
-        <div style="font-size: 24px; font-weight: 600; color: #f59e0b;" id="totalExits">0</div>
-      </div>
-    </div>
   </div>
 
   <div id="scaleWrap" class="viz" aria-label="Gate visualization">
@@ -245,7 +251,7 @@
 </div>
 
 <div class="card" style="margin-top: 18px; max-width: 900px; width: 100%;">
-  <h3 style="margin:0 0 16px 0; font-size: clamp(18px, 4vw, 22px); font-weight:700; background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">📈 Analytics Dashboard</h3>
+  <h3 style="margin:0 0 16px 0; font-size: clamp(18px, 4vw, 22px); font-weight:700; background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">📈 Analytics Dashboard</h3>
   <div class="charts-grid">
     <div class="chart-card">
       <div class="chart-title">Customers Count</div>
@@ -257,7 +263,7 @@
     </div>
   </div>
   <small style="color:#94a3b8; display:block; margin-top:12px;">Last 50 readings</small>
-  <button id="clearBtn" style="margin-top:12px; background:linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%); color:#ffffff; border:none; padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:600; font-size:13px; box-shadow: 0 8px 20px rgba(6, 182, 212, 0.3); transition: all 0.2s ease;">Clear Data</button>
+  <button id="clearBtn" style="margin-top:12px; background:linear-gradient(135deg, #a855f7 0%, #ec4899 100%); color:#ffffff; border:none; padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:600; font-size:13px; box-shadow: 0 8px 20px rgba(168, 85, 247, 0.4); transition: all 0.2s ease;">Clear Data</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -287,7 +293,7 @@ function createOrUpdateChart(chartRef, canvasId, label, labels, data, color, yBo
             display: datasets ? true : false,
             labels: { color: '#94a3b8', font: { weight: 600, size: 12 } }
           }, 
-          tooltip: { enabled: true, backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: 'rgba(6, 182, 212, 0.5)', borderWidth: 1 } 
+          tooltip: { enabled: true, backgroundColor: 'rgba(15, 15, 35, 0.95)', borderColor: 'rgba(168, 85, 247, 0.5)', borderWidth: 1 } 
         },
         scales: {
           x: { ticks: { color: '#94a3b8', maxRotation: 0, autoSkip: true }, grid: { color: 'rgba(148, 163, 184, 0.1)' } },
@@ -316,7 +322,7 @@ function pushHistory(list, value) {
 function renderCharts() {
   const custLabels = customersHistory.map(i => i.t.toLocaleTimeString());
   const custData = customersHistory.map(i => i.v);
-  customersChart = createOrUpdateChart(customersChart, 'chartCustomers', 'Customers', custLabels, custData, '#06b6d4', { min: 0, suggestedMax: Math.max(5, Math.ceil((Math.max(0, ...custData) + 1) / 5) * 5) });
+  customersChart = createOrUpdateChart(customersChart, 'chartCustomers', 'Customers', custLabels, custData, '#a855f7', { min: 0, suggestedMax: Math.max(5, Math.ceil((Math.max(0, ...custData) + 1) / 5) * 5) });
 
   // Traffic rate chart: entries and exits per minute
   const trafficLabels = trafficRateData.map(i => i.t.toLocaleTimeString());
@@ -326,7 +332,15 @@ function renderCharts() {
     { label: 'Entries', data: entriesData, borderColor: '#10b981', backgroundColor: '#10b98133', tension: 0.4, fill: true, pointRadius: 0, borderWidth: 3 },
     { label: 'Exits', data: exitsData, borderColor: '#f59e0b', backgroundColor: '#f59e0b33', tension: 0.4, fill: true, pointRadius: 0, borderWidth: 3 }
   ];
-  trafficChart = createOrUpdateChart(trafficChart, 'chartTraffic', 'Traffic', trafficLabels, null, null, { min: 0, suggestedMax: 5 }, trafficDatasets);
+  
+  // Ensure we have data or provide empty arrays
+  if (trafficRateData.length === 0) {
+    trafficDatasets[0].data = [0];
+    trafficDatasets[1].data = [0];
+    trafficLabels.push(new Date().toLocaleTimeString());
+  }
+  
+  trafficChart = createOrUpdateChart(trafficChart, 'chartTraffic', 'Traffic', trafficLabels.length > 0 ? trafficLabels : [new Date().toLocaleTimeString()], null, null, { min: 0, suggestedMax: 5 }, trafficDatasets);
 }
 
 document.getElementById('clearBtn').addEventListener('click', () => {
@@ -464,6 +478,35 @@ if (client) {
     }
   });
 }
+
+// Initial render of charts
+renderCharts();
+
+// Resize gates on mobile
+function resizeGatesForMobile() {
+  const isMobile = window.innerWidth <= 480;
+  const entryGate = document.getElementById('gateEntry');
+  const exitGate = document.getElementById('gateExit');
+  
+  if (isMobile && entryGate && exitGate) {
+    // Scale gates up on mobile - gates are positioned via x/y, so we scale from center
+    const entryRect = entryGate.getBBox();
+    const exitRect = exitGate.getBBox();
+    const scale = 1.5;
+    entryGate.setAttribute('transform', `translate(${entryRect.x + entryRect.width/2}, ${entryRect.y + entryRect.height/2}) scale(${scale}) translate(${-entryRect.width/2}, ${-entryRect.height/2})`);
+    exitGate.setAttribute('transform', `translate(${exitRect.x + exitRect.width/2}, ${exitRect.y + exitRect.height/2}) scale(${scale}) translate(${-exitRect.width/2}, ${-exitRect.height/2})`);
+  } else if (entryGate && exitGate) {
+    // Reset to normal size
+    entryGate.removeAttribute('transform');
+    exitGate.removeAttribute('transform');
+  }
+}
+
+// Use setTimeout to ensure SVG is rendered before getting bounding boxes
+setTimeout(() => {
+  window.addEventListener('resize', resizeGatesForMobile);
+  resizeGatesForMobile();
+}, 100);
 </script>
 
 </body>
