@@ -12,9 +12,9 @@
   }
   
   body {
-    background: #0a0a0a;
+    background: linear-gradient(135deg, #fef9f3 0%, #fde7d3 100%);
     min-height: 100vh;
-    color: #e0e0e0;
+    color: #2d2d2d;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
     display: flex;
     flex-direction: column;
@@ -23,10 +23,10 @@
   }
   
   h2 {
-    font-size: clamp(22px, 5vw, 28px);
+    font-size: clamp(24px, 5vw, 32px);
     font-weight: 600;
     margin-bottom: 8px;
-    color: #ffffff;
+    color: #2d2d2d;
     text-align: center;
   }
   
@@ -35,51 +35,57 @@
     margin-bottom: 25px;
     font-size: clamp(12px, 3vw, 14px);
     font-weight: 500;
-    color: #ffffff;
+    color: #4a4a4a;
     text-align: center;
   }
   
   .card {
-    background: #1a1a1a;
-    padding: clamp(20px, 5vw, 30px);
-    border-radius: 12px;
+    background: #ffffff;
+    padding: clamp(24px, 5vw, 32px);
+    border-radius: 20px;
     width: 100%;
     max-width: 900px;
     text-align: center;
-    border: 1px solid #2a2a2a;
+    border: none;
+    box-shadow: 0 8px 24px rgba(255,107,53,0.12), 0 2px 8px rgba(255,107,53,0.08);
   }
   
   .sensor-item {
-    background: #242424;
-    padding: clamp(16px, 4vw, 20px);
-    border-radius: 8px;
+    background: linear-gradient(135deg, #fff5f0 0%, #ffe8db 100%);
+    padding: clamp(20px, 5vw, 28px);
+    border-radius: 16px;
     margin: 12px 0;
-    border: 1px solid #333;
+    border: 2px solid #ffd4b8;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
   }
   
   .sensor-item p {
-    font-size: clamp(12px, 3vw, 14px);
-    margin-bottom: 8px;
-    font-weight: 500;
+    font-size: clamp(13px, 3vw, 15px);
+    margin-bottom: 4px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #888;
+    letter-spacing: 0.8px;
+    color: #ff6b35;
   }
   
   .value {
-    font-size: clamp(32px, 8vw, 42px);
-    font-weight: 700;
-    color: #ffffff;
+    font-size: clamp(36px, 8vw, 48px);
+    font-weight: 600;
+    color: #ff6b35;
     letter-spacing: -1px;
   }
 
   .viz {
     margin-top: 18px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-    border: 1px solid #2a2a2a;
-    border-radius: 10px;
+    background: rgba(255,255,255,0.6);
+    border: 2px solid #ffd4b8;
+    border-radius: 16px;
     overflow: visible;
-    padding: clamp(8px, 2vw, 12px);
+    padding: clamp(12px, 3vw, 16px);
   }
   #scaleWrap {
     width: 100%;
@@ -91,45 +97,33 @@
     display: block;
     overflow: visible;
   }
-  
-  /* removed moving object styling */
-  
-  .legend {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
-    color: #aaa;
-    font-size: clamp(11px, 2.5vw, 13px);
-  }
-  .legend .right { text-align: right; }
 
   #errorMsg {
     display: none;
     margin-top: 10px;
     font-size: clamp(11px, 2.5vw, 13px);
-    color: #ff6b6b;
-    background: #2a1a1a;
+    color: #dc2626;
+    background: #fee2e2;
     padding: 8px 12px;
-    border-radius: 6px;
+    border-radius: 8px;
     font-weight: 500;
-    border: 1px solid #3a2020;
+    border: 1px solid #fca5a5;
   }
 
   /* Gates and event lights */
   .gate {
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.35));
+    filter: drop-shadow(0 2px 6px rgba(139,69,19,0.25));
   }
   .gate-label {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
-    fill: rgba(255,255,255,0.8);
+    fill: #8b4513;
     text-anchor: middle;
   }
-  .gate-post { fill: #2f2f2f; stroke: #555; stroke-width: 2; }
-  .gate-bar  { fill: #3a3a3a; }
-  .gate-light { fill: #555; }
-  .gate-entry-active .gate-light { fill: #34d399; }
+  .gate-post { fill: #8b4513; stroke: #654321; stroke-width: 2; }
+  .gate-bar  { fill: #d2691e; }
+  .gate-light { fill: #ddd; }
+  .gate-entry-active .gate-light { fill: #10b981; }
   .gate-exit-active .gate-light { fill: #f59e0b; }
   .blink {
     animation: blinkPulse 2000ms ease-out 1;
@@ -143,46 +137,56 @@
 
   /* Charts */
   .charts-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
     margin-top: 18px;
   }
   .chart-card {
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    border-radius: 8px;
-    padding: 12px;
+    background: #ffffff;
+    border: 2px solid #ffd4b8;
+    border-left: 4px solid #ff6b35;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(255,107,53,0.08);
   }
   .chart-title {
-    font-size: clamp(12px, 3vw, 13px);
-    color: #aaa;
-    margin-bottom: 8px;
+    font-size: clamp(12px, 3vw, 14px);
+    color: #ff6b35;
+    margin-bottom: 12px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
+    font-weight: 600;
   }
-  canvas { width: 100% !important; height: 180px !important; }
+  canvas { width: 100% !important; height: 200px !important; }
 
   /* Mobile tweaks */
   @media (max-width: 768px) {
     body { padding: 20px 10px; }
     .card { 
-      border-radius: 10px;
-      padding: clamp(16px, 4vw, 24px);
+      border-radius: 16px;
+      padding: clamp(18px, 4vw, 24px);
+    }
+    .charts-grid {
+      grid-template-columns: 1fr;
     }
     .viz {
-      padding: clamp(6px, 1.5vw, 10px);
+      padding: clamp(10px, 2vw, 14px);
     }
     #scaleWrap {
-      height: clamp(160px, 40vw, 240px);
+      height: clamp(180px, 40vw, 240px);
     }
   }
   
   @media (max-width: 480px) {
-    h2 { font-size: clamp(20px, 6vw, 24px); }
+    h2 { font-size: clamp(22px, 6vw, 26px); }
     .subtitle { font-size: clamp(11px, 3vw, 13px); }
+    .sensor-item {
+      flex-direction: column;
+      text-align: center;
+    }
     #scaleWrap {
-      height: clamp(140px, 45vw, 200px);
+      height: clamp(160px, 45vw, 200px);
     }
   }
 </style>
@@ -194,11 +198,21 @@
 <div class="subtitle">Sumanaswi Akkisetty, RA2211026010158</div>
 
 <div class="card">
-  
-
   <div class="sensor-item">
-    <p>Customers</p>
-    <div id="customerVal" class="value">0</div>
+    <div style="flex: 1; text-align: left;">
+      <p>Current Customers</p>
+      <div id="customerVal" class="value">0</div>
+    </div>
+    <div style="display: flex; gap: 24px; align-items: center;">
+      <div style="text-align: center;">
+        <p style="font-size: 11px; margin-bottom: 4px;">Entries Today</p>
+        <div style="font-size: 24px; font-weight: 600; color: #10b981;" id="totalEntries">0</div>
+      </div>
+      <div style="text-align: center;">
+        <p style="font-size: 11px; margin-bottom: 4px;">Exits Today</p>
+        <div style="font-size: 24px; font-weight: 600; color: #f59e0b;" id="totalExits">0</div>
+      </div>
+    </div>
   </div>
 
   <div id="scaleWrap" class="viz" aria-label="Gate visualization">
@@ -225,7 +239,7 @@
 </div>
 
 <div class="card" style="margin-top: 18px; max-width: 900px; width: 100%;">
-  <h3 style="margin:0 0 10px 0; font-size: clamp(18px, 4vw, 20px); font-weight:600; color:#fff;">📈 Graphs</h3>
+  <h3 style="margin:0 0 16px 0; font-size: clamp(18px, 4vw, 22px); font-weight:600; color:#2d2d2d;">📈 Analytics Dashboard</h3>
   <div class="charts-grid">
     <div class="chart-card">
       <div class="chart-title">Customers Count</div>
@@ -236,8 +250,8 @@
       <canvas id="chartTraffic" aria-label="Traffic rate chart"></canvas>
     </div>
   </div>
-  <small style="color:#777; display:block; margin-top:8px;">Last 50 readings</small>
-  <button id="clearBtn" style="margin-top:10px; background:#242424; color:#e0e0e0; border:1px solid #333; padding:6px 14px; border-radius:6px; cursor:pointer; font-weight:500; font-size:13px;">Clear</button>
+  <small style="color:#4a4a4a; display:block; margin-top:12px;">Last 50 readings</small>
+  <button id="clearBtn" style="margin-top:12px; background:linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color:#ffffff; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:600; font-size:13px; box-shadow: 0 4px 12px rgba(255,107,53,0.25); transition: all 0.2s ease;">Clear Data</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -254,7 +268,7 @@ function createOrUpdateChart(chartRef, canvasId, label, labels, data, color, yBo
   const ctx = document.getElementById(canvasId);
   if (!ctx) return chartRef;
   if (!chartRef) {
-    const chartDatasets = datasets || [{ label, data, borderColor: color, backgroundColor: color + '33', tension: 0.25, fill: true, pointRadius: 0, borderWidth: 2 }];
+    const chartDatasets = datasets || [{ label, data, borderColor: color, backgroundColor: color + '33', tension: 0.3, fill: true, pointRadius: 0, borderWidth: 3 }];
     return new Chart(ctx, {
       type: 'line',
       data: { labels, datasets: chartDatasets },
@@ -262,10 +276,16 @@ function createOrUpdateChart(chartRef, canvasId, label, labels, data, color, yBo
         responsive: true,
         maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
-        plugins: { legend: { display: datasets ? true : false }, tooltip: { enabled: true } },
+        plugins: { 
+          legend: { 
+            display: datasets ? true : false,
+            labels: { color: '#4a4a4a', font: { weight: 600 } }
+          }, 
+          tooltip: { enabled: true, backgroundColor: 'rgba(45,45,45,0.9)' } 
+        },
         scales: {
-          x: { ticks: { color: '#aaa', maxRotation: 0, autoSkip: true }, grid: { color: 'rgba(255,255,255,0.06)' } },
-          y: { ticks: { color: '#aaa' }, grid: { color: 'rgba(255,255,255,0.06)' }, min: yBounds?.min, max: yBounds?.max, suggestedMin: yBounds?.suggestedMin, suggestedMax: yBounds?.suggestedMax }
+          x: { ticks: { color: '#4a4a4a', maxRotation: 0, autoSkip: true }, grid: { color: 'rgba(0,0,0,0.05)' } },
+          y: { ticks: { color: '#4a4a4a' }, grid: { color: 'rgba(0,0,0,0.05)' }, min: yBounds?.min, max: yBounds?.max, suggestedMin: yBounds?.suggestedMin, suggestedMax: yBounds?.suggestedMax }
         }
       }
     });
@@ -290,15 +310,15 @@ function pushHistory(list, value) {
 function renderCharts() {
   const custLabels = customersHistory.map(i => i.t.toLocaleTimeString());
   const custData = customersHistory.map(i => i.v);
-  customersChart = createOrUpdateChart(customersChart, 'chartCustomers', 'Customers', custLabels, custData, '#ffb74d', { min: 0, suggestedMax: Math.max(5, Math.ceil((Math.max(0, ...custData) + 1) / 5) * 5) });
+  customersChart = createOrUpdateChart(customersChart, 'chartCustomers', 'Customers', custLabels, custData, '#ff6b35', { min: 0, suggestedMax: Math.max(5, Math.ceil((Math.max(0, ...custData) + 1) / 5) * 5) });
 
   // Traffic rate chart: entries and exits per minute
   const trafficLabels = trafficRateData.map(i => i.t.toLocaleTimeString());
   const entriesData = trafficRateData.map(i => i.entries);
   const exitsData = trafficRateData.map(i => i.exits);
   const trafficDatasets = [
-    { label: 'Entries', data: entriesData, borderColor: '#34d399', backgroundColor: '#34d39933', tension: 0.25, fill: true, pointRadius: 2, borderWidth: 2 },
-    { label: 'Exits', data: exitsData, borderColor: '#f59e0b', backgroundColor: '#f59e0b33', tension: 0.25, fill: true, pointRadius: 2, borderWidth: 2 }
+    { label: 'Entries', data: entriesData, borderColor: '#10b981', backgroundColor: '#10b98133', tension: 0.3, fill: true, pointRadius: 0, borderWidth: 3 },
+    { label: 'Exits', data: exitsData, borderColor: '#f59e0b', backgroundColor: '#f59e0b33', tension: 0.3, fill: true, pointRadius: 0, borderWidth: 3 }
   ];
   trafficChart = createOrUpdateChart(trafficChart, 'chartTraffic', 'Traffic', trafficLabels, null, null, { min: 0, suggestedMax: 5 }, trafficDatasets);
 }
@@ -315,10 +335,10 @@ function pulseGate(which) {
   const exit = document.getElementById('gateExit');
   if (which === 'entry' && entry) {
     entry.classList.add('gate-entry-active', 'blink');
-    setTimeout(() => entry.classList.remove('gate-entry-active', 'blink'), 2000);
+    setTimeout(() => entry.classList.remove('gate-entry-active', 'blink'), 1200);
   } else if (which === 'exit' && exit) {
     exit.classList.add('gate-exit-active', 'blink');
-    setTimeout(() => exit.classList.remove('gate-exit-active', 'blink'), 2000);
+    setTimeout(() => exit.classList.remove('gate-exit-active', 'blink'), 1200);
   }
 }
 
@@ -326,6 +346,8 @@ function pulseGate(which) {
 let currentMinuteKey = '';
 let currentMinuteEntries = 0;
 let currentMinuteExits = 0;
+let totalEntriesToday = 0;
+let totalExitsToday = 0;
 
 function getMinuteKey(date) {
   const h = date.getHours();
@@ -350,8 +372,15 @@ function recordTrafficEvent(eventType) {
     currentMinuteExits = 0;
   }
   
-  if (eventType === 'entry') currentMinuteEntries++;
-  else if (eventType === 'exit') currentMinuteExits++;
+  if (eventType === 'entry') {
+    currentMinuteEntries++;
+    totalEntriesToday++;
+    document.getElementById('totalEntries').textContent = totalEntriesToday;
+  } else if (eventType === 'exit') {
+    currentMinuteExits++;
+    totalExitsToday++;
+    document.getElementById('totalExits').textContent = totalExitsToday;
+  }
 }
 
 // Initial setup: no distance scale
