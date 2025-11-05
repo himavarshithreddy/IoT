@@ -204,6 +204,7 @@
   
   #historyHint {
     color: #666;
+    text-align: center;
   }
   
   #errorMsg {
@@ -399,6 +400,20 @@
     .charts-grid .chart-card:nth-child(1) { grid-column: 2; }
     .charts-grid .chart-card:nth-child(2) { grid-column: 4; }
     .charts-grid .chart-card:nth-child(3) { grid-column: 6; }
+
+    /* Align graphs heading and controls with 5% side margins */
+    #historySection h3 {
+      margin-left: 5%;
+      margin-right: 5%;
+    }
+    #historySection .history-header {
+      margin-left: 5%;
+      margin-right: 5%;
+    }
+    #historySection .history-header small {
+      flex: 1;
+      text-align: center;
+    }
   }
 </style>
 </head>
