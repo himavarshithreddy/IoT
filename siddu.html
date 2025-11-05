@@ -286,63 +286,83 @@
     }
   }
   
-  /* Thresholds and advice UI */
-  .form {
-    margin-top: 10px;
+  /* Smart actions UI */
+  .smart-section {
+    margin-top: 24px;
+    width: 100%;
+    max-width: 380px;
   }
-  .form-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin: 8px 0;
+  .smart-section h3 {
+    margin: 0 0 12px 0;
+    font-weight: 600;
+    font-size: clamp(18px, 4vw, 20px);
+    color: #ffffff;
   }
-  .form-row label {
-    color: #bbb;
-    font-size: clamp(12px, 3vw, 13px);
-  }
-  .form-row input[type="number"] {
-    width: 100px;
-    background: #0f0f0f;
-    color: #e0e0e0;
-    border: 1px solid #333;
-    border-radius: 6px;
-    padding: 8px 10px;
-  }
-  .advice-list {
-    list-style: none;
-    padding: 0;
-    margin: 8px 0 0 0;
-    text-align: left;
-  }
-  .advice-list li {
+  .action-group {
     background: #242424;
-    border: 1px solid #333;
+    padding: 12px 14px;
     border-radius: 8px;
-    padding: 10px 12px;
-    margin: 8px 0;
-    font-size: clamp(12px, 3vw, 14px);
+    margin: 10px 0;
+    border: 1px solid #333;
   }
-  .advice-empty {
-    color: #666;
-    font-size: clamp(11px, 2.5vw, 13px);
+  .action-group h4 {
+    margin: 0 0 8px 0;
+    font-size: clamp(11px, 2.5vw, 12px);
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .action-item {
+    font-size: clamp(12px, 3vw, 14px);
+    color: #e0e0e0;
+    line-height: 1.4;
   }
   .badge {
     display: inline-block;
     padding: 2px 8px;
     border-radius: 999px;
-    font-size: 12px;
-    margin-left: 8px;
-    border: 1px solid transparent;
+    font-size: 11px;
+    margin-right: 6px;
+    background: #333;
+    color: #ddd;
   }
-  .badge-ok { background: #143a1a; color: #9be29f; border-color: #1e5226; }
-  .badge-warn { background: #3a2f14; color: #f2d28c; border-color: #5a4a1e; }
-  .badge-alert { background: #3a1414; color: #ff9e9e; border-color: #5a1e1e; }
+  .severity-warn .badge { background: #3a2a1a; color: #f1c27d; }
+  .severity-alert .badge { background: #3a2020; color: #ff9b9b; }
+  .ok { color: #8bc34a; }
+
+  /* Charts section */
+  .charts-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .chart-card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .chart-title {
+    font-size: clamp(12px, 3vw, 13px);
+    color: #aaa;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  canvas {
+    width: 100% !important;
+    height: 180px !important;
+  }
 </style>
 </head>
 <body>
 
-<h2>🧠 Smart Room Monitor</h2>
+<h2>🌡️ Live ESP32 Sensor Data</h2>
 
 <div class="subtitle">Himavarshith Reddy, RA2211026010170</div>
 
@@ -365,94 +385,60 @@
   </div>
 </div>
 
-<div class="card" id="thresholdsCard">
-  <h3>⚙️ Thresholds</h3>
-  <div class="form">
-    <div class="form-row">
-      <label for="tempMin">Temperature min (°C)</label>
-      <input id="tempMin" type="number" step="0.5" />
-    </div>
-    <div class="form-row">
-      <label for="tempMax">Temperature max (°C)</label>
-      <input id="tempMax" type="number" step="0.5" />
-    </div>
-    <div class="form-row">
-      <label for="humMin">Humidity min (%)</label>
-      <input id="humMin" type="number" step="1" />
-    </div>
-    <div class="form-row">
-      <label for="humMax">Humidity max (%)</label>
-      <input id="humMax" type="number" step="1" />
-    </div>
-    <div class="form-row">
-      <label for="lightLow">Light low (%)</label>
-      <input id="lightLow" type="number" step="1" />
-    </div>
-    <div class="form-row">
-      <label for="lightHigh">Light high (%)</label>
-      <input id="lightHigh" type="number" step="1" />
+<div id="smartSection" class="smart-section">
+  <h3>🧠 Smart Room Monitor</h3>
+  <div class="action-group" id="summaryGroup">
+    <h4>Summary</h4>
+    <div id="smartSummary" class="actions">
+      <div class="action-item ok">Waiting for live data…</div>
     </div>
   </div>
-  <small id="thresholdsHint" class="subtitle" style="margin:10px 0 0 0;">Saved locally • updates suggestions live</small>
-  
-</div>
-
-<div class="card" id="adviceCard">
-  <h3>🧭 Suggestions</h3>
-  <div>
-    <p class="subtitle" style="margin:6px 0 8px 0;">Per aspect</p>
-    <ul id="perAdviceList" class="advice-list"></ul>
-    <small id="perAdviceEmpty" class="advice-empty">All values within thresholds.</small>
+  <div class="action-group">
+    <h4>Temperature</h4>
+    <div id="tempActions" class="actions"><div class="action-item ok">No action needed</div></div>
   </div>
-  <div style="margin-top:14px;">
-    <p class="subtitle" style="margin:6px 0 8px 0;">Combined</p>
-    <ul id="combinedAdviceList" class="advice-list"></ul>
-    <small id="combinedAdviceEmpty" class="advice-empty">No combined actions needed.</small>
+  <div class="action-group">
+    <h4>Humidity</h4>
+    <div id="humActions" class="actions"><div class="action-item ok">No action needed</div></div>
+  </div>
+  <div class="action-group">
+    <h4>Light</h4>
+    <div id="lightActions" class="actions"><div class="action-item ok">No action needed</div></div>
+  </div>
+  <div class="action-group">
+    <h4>Combined</h4>
+    <div id="combinedActions" class="actions"><div class="action-item ok">No combined actions</div></div>
   </div>
 </div>
 
 <div id="historySection">
-  <h3>📊 History</h3>
+  <h3>📈 Graphs</h3>
   <div class="history-header">
     <small>Last 50 readings</small>
     <button id="clearHistoryBtn">Clear</button>
   </div>
-  <ul id="history">
-    <!-- history items injected here -->
-  </ul>
-  <small id="historyEmpty" style="display:none;">No history yet.</small>
+  <div class="charts-grid" id="chartsGrid">
+    <div class="chart-card">
+      <div class="chart-title">Temperature (°C)</div>
+      <canvas id="chartTemp" aria-label="Temperature chart"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Humidity (%)</div>
+      <canvas id="chartHum" aria-label="Humidity chart"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Light (%)</div>
+      <canvas id="chartLight" aria-label="Light chart"></canvas>
+    </div>
+  </div>
+  <small id="historyEmpty" style="display:none;">No data yet.</small>
   <small id="historyHint">New entries are saved automatically.</small>
   <small id="errorMsg" style="display:none;">Could not fetch data. Retrying…</small>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <script>
-// ---- Thresholds (with persistence) ----
-const THRESHOLDS_KEY = 'sensorThresholds';
-const DEFAULT_THRESHOLDS = {
-  temperature: { min: 20, max: 26 },
-  humidity: { min: 40, max: 60 },
-  light: { low: 20, high: 70 }
-};
-
-function loadThresholdsStore() {
-  try {
-    const raw = JSON.parse(localStorage.getItem(THRESHOLDS_KEY) || 'null');
-    if (!raw || typeof raw !== 'object') return structuredClone(DEFAULT_THRESHOLDS);
-    return {
-      temperature: { ...DEFAULT_THRESHOLDS.temperature, ...(raw.temperature || {}) },
-      humidity: { ...DEFAULT_THRESHOLDS.humidity, ...(raw.humidity || {}) },
-      light: { ...DEFAULT_THRESHOLDS.light, ...(raw.light || {}) }
-    };
-  } catch { return structuredClone(DEFAULT_THRESHOLDS); }
-}
-
-function saveThresholdsStore(t) {
-  try { localStorage.setItem(THRESHOLDS_KEY, JSON.stringify(t)); } catch {}
-}
-
-let thresholds = loadThresholdsStore();
-
 // ---- Persistent history helpers ----
 const HISTORY_KEY = 'sensorHistory';
 const MAX_HISTORY = 50;
@@ -474,23 +460,71 @@ function formatTime(iso) {
   } catch { return iso; }
 }
 
-function renderHistory(list) {
-  const ul = document.getElementById('history');
-  const empty = document.getElementById('historyEmpty');
-  ul.innerHTML = '';
-  if (!list || list.length === 0) {
-    empty.style.display = 'inline';
-    return;
+let tempChart, humChart, lightChart;
+
+function createOrUpdateChart(chartRef, canvasId, label, labels, data, color) {
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return chartRef;
+  if (!chartRef) {
+    return new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label,
+          data,
+          borderColor: color,
+          backgroundColor: color + '33',
+          tension: 0.25,
+          fill: true,
+          pointRadius: 0,
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: true }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#aaa', maxRotation: 0, autoSkip: true },
+            grid: { color: 'rgba(255,255,255,0.06)' }
+          },
+          y: {
+            ticks: { color: '#aaa' },
+            grid: { color: 'rgba(255,255,255,0.06)' }
+          }
+        }
+      }
+    });
+  } else {
+    chartRef.data.labels = labels;
+    chartRef.data.datasets[0].data = data;
+    chartRef.update('none');
+    return chartRef;
   }
-  empty.style.display = 'none';
-  list.forEach(item => {
-    const li = document.createElement('li');
-    const lightHtml = (item.light === undefined || item.light === null) ? '' : `
-        <div class="history-value">💡 ${item.light}%</div>
-      `;
-    li.innerHTML = `<div class=\"history-item-content\">\n      <div class=\"history-values\">\n        <div class=\"history-value\">🌡️ ${item.temperature}°C</div>\n        <div class=\"history-value\">💧 ${item.humidity}%</div>\n        ${lightHtml}\n      </div>\n      <div class=\"history-time\">${formatTime(item.time)}</div>\n    </div>`;
-    ul.appendChild(li);
+}
+
+function renderHistory(list) {
+  const empty = document.getElementById('historyEmpty');
+  const hasData = !!(list && list.length);
+  empty.style.display = hasData ? 'none' : 'inline';
+
+  const chronological = [...(list || [])].reverse();
+  const labels = chronological.map(i => {
+    try { return new Date(i.time).toLocaleTimeString(); } catch { return i.time; }
   });
+  const temps = chronological.map(i => i.temperature);
+  const hums = chronological.map(i => i.humidity);
+  const lights = chronological.map(i => i.light ?? null);
+
+  tempChart = createOrUpdateChart(tempChart, 'chartTemp', 'Temperature', labels, temps, '#ffb74d');
+  humChart = createOrUpdateChart(humChart, 'chartHum', 'Humidity', labels, hums, '#64b5f6');
+  lightChart = createOrUpdateChart(lightChart, 'chartLight', 'Light', labels, lights, '#ffd54f');
 }
 
 document.getElementById('clearHistoryBtn').addEventListener('click', () => {
@@ -504,7 +538,7 @@ renderHistory(historyList);
 let lastRecorded = historyList.length ? { t: historyList[0].temperature, h: historyList[0].humidity, l: historyList[0].light } : null; // newest-first
 
 // Light thresholds for 0–100 scale
-const LIGHT_THRESHOLDS = { low: thresholds.light.low, high: thresholds.light.high };
+const LIGHT_THRESHOLDS = { low: 20, high: 70 };
 
 function updateLightUI(lightValue) {
   const indicator = document.getElementById('lightIndicator');
@@ -541,145 +575,154 @@ function updateLightUI(lightValue) {
   stateEl.textContent = stateLabel;
 }
 
-// ---- Advice generation ----
-function renderPerAdvice(items) {
-  const ul = document.getElementById('perAdviceList');
-  const empty = document.getElementById('perAdviceEmpty');
-  if (!ul || !empty) return;
-  ul.innerHTML = '';
-  if (!items.length) { empty.style.display = 'inline'; return; }
-  empty.style.display = 'none';
-  items.forEach(html => {
-    const li = document.createElement('li');
-    li.innerHTML = html;
-    ul.appendChild(li);
-  });
+// ---- Smart actions thresholds & logic ----
+const TEMP_THRESHOLDS = {
+  comfortMin: 22,
+  comfortMax: 26,
+  mildCoolMin: 18,      // 18–22°C: light heating suggested
+  veryCold: 14,         // <= 14°C: alert
+  warm: 30,             // > 26–30: warm
+  hot: 33,              // > 30–33: hot
+  veryHot: 35,          // > 33–35: very hot
+  highExtreme: 37       // >= 37°C: critical alert
+};
+const HUMID_THRESHOLDS = { comfortMin: 35, comfortMax: 60, spikeDelta: 15 };
+const NIGHT_HOURS = { start: 22, end: 6 }; // 22:00 - 06:00
+let tempHighSince = null;
+
+function isNightNow() {
+  const hour = new Date().getHours();
+  return NIGHT_HOURS.start > NIGHT_HOURS.end
+    ? (hour >= NIGHT_HOURS.start || hour < NIGHT_HOURS.end)
+    : (hour >= NIGHT_HOURS.start && hour < NIGHT_HOURS.end);
 }
 
-function renderCombinedAdvice(items) {
-  const ul = document.getElementById('combinedAdviceList');
-  const empty = document.getElementById('combinedAdviceEmpty');
-  if (!ul || !empty) return;
-  ul.innerHTML = '';
-  if (!items.length) { empty.style.display = 'inline'; return; }
-  empty.style.display = 'none';
-  items.forEach(html => {
-    const li = document.createElement('li');
-    li.innerHTML = html;
-    ul.appendChild(li);
-  });
-}
+function evaluateSmartActions(curr, prev) {
+  const actions = { temperature: [], humidity: [], light: [], combined: [], summary: [] };
+  const t = Number(curr?.temperature);
+  const h = Number(curr?.humidity);
+  const l = Number(curr?.light);
+  const prevH = Number(prev?.humidity);
+  const prevL = Number(prev?.light);
 
-function badge(text, kind) {
-  const klass = kind === 'ok' ? 'badge-ok' : kind === 'alert' ? 'badge-alert' : 'badge-warn';
-  return `<span class="badge ${klass}">${text}</span>`;
-}
-
-function evaluatePerAspectAdvice(currentVals, th) {
-  const adv = [];
-  if (Number.isFinite(currentVals.temperature)) {
-    if (currentVals.temperature > th.temperature.max) {
-      adv.push(`It is hot (\u2265 ${th.temperature.max}°C). Turn on AC/fan ${badge('Action', 'alert')}`);
-    } else if (currentVals.temperature < th.temperature.min) {
-      adv.push(`It is cold (\u2264 ${th.temperature.min}°C). Turn on heater ${badge('Action', 'alert')}`);
+  // Temperature actions (granular)
+  if (Number.isFinite(t)) {
+    if (t >= TEMP_THRESHOLDS.highExtreme) {
+      actions.temperature.push({ text: 'Critical heat — trigger alert notification; set AC to max cool', severity: 'alert' });
+    } else if (t > TEMP_THRESHOLDS.veryHot) {
+      actions.temperature.push({ text: 'Very hot — set AC to cool (20–22°C), fan high speed', severity: 'warn' });
+    } else if (t > TEMP_THRESHOLDS.hot) {
+      actions.temperature.push({ text: 'Hot — turn on AC (24–26°C) and close doors/windows', severity: 'warn' });
+    } else if (t > TEMP_THRESHOLDS.comfortMax) {
+      actions.temperature.push({ text: 'Warm — turn on fan (medium) or AC eco mode', severity: 'info' });
+    } else if (t < TEMP_THRESHOLDS.comfortMin && t >= TEMP_THRESHOLDS.mildCoolMin) {
+      tempHighSince = null;
+      actions.temperature.push({ text: 'Mild cool — turn off fan; set heater low if needed', severity: 'info' });
+    } else if (t < TEMP_THRESHOLDS.mildCoolMin && t > TEMP_THRESHOLDS.veryCold) {
+      tempHighSince = null;
+      actions.temperature.push({ text: 'Cold — enable heater mode (moderate) and close drafts', severity: 'warn' });
+    } else if (t <= TEMP_THRESHOLDS.veryCold) {
+      tempHighSince = null;
+      actions.temperature.push({ text: 'Extreme cold — trigger alert; set heater to safe level', severity: 'alert' });
     } else {
-      adv.push(`Temperature is comfortable ${badge('OK', 'ok')}`);
+      tempHighSince = null;
+    }
+
+    // Persistence check for sustained heat
+    if (t > TEMP_THRESHOLDS.comfortMax) {
+      if (!tempHighSince) tempHighSince = Date.now();
+      else if (Date.now() - tempHighSince >= 180000) {
+        actions.temperature.push({ text: 'Temperature stays high — increase fan speed / AC mode', severity: 'warn' });
+      }
+    }
+
+    // Rapid rise detection
+    const prevT = Number(prev?.temperature);
+    if (Number.isFinite(prevT) && t - prevT >= 2.0) {
+      actions.temperature.push({ text: 'Rapid temperature rise — check for heat sources or sunlight', severity: 'warn' });
     }
   }
-  if (Number.isFinite(currentVals.humidity)) {
-    if (currentVals.humidity > th.humidity.max) {
-      adv.push(`Humidity is high (\u2265 ${th.humidity.max}%). Use dehumidifier/ventilation ${badge('Action', 'warn')}`);
-    } else if (currentVals.humidity < th.humidity.min) {
-      adv.push(`Air is dry (\u2264 ${th.humidity.min}%). Use humidifier ${badge('Action', 'warn')}`);
-    } else {
-      adv.push(`Humidity is optimal ${badge('OK', 'ok')}`);
+
+  // Humidity actions
+  if (Number.isFinite(h)) {
+    if (h > HUMID_THRESHOLDS.comfortMax) {
+      actions.humidity.push({ text: 'Turn on ventilation fan / dehumidifier', severity: 'warn' });
+    } else if (h < HUMID_THRESHOLDS.comfortMin) {
+      actions.humidity.push({ text: 'Turn on humidifier (or recommend manual action)', severity: 'warn' });
+    }
+    if (Number.isFinite(prevH) && (h - prevH) >= HUMID_THRESHOLDS.spikeDelta && h >= 70) {
+      actions.humidity.push({ text: 'Abnormal spike — send water leakage / moisture warning', severity: 'alert' });
     }
   }
-  if (Number.isFinite(currentVals.light)) {
-    if (currentVals.light >= th.light.high) {
-      adv.push(`Light is bright (\u2265 ${th.light.high}%). Dim lights/close curtains ${badge('Action', 'warn')}`);
-    } else if (currentVals.light <= th.light.low) {
-      adv.push(`Room is dark (\u2264 ${th.light.low}%). Turn on lights/open curtains ${badge('Action', 'warn')}`);
-    } else {
-      adv.push(`Light level is moderate ${badge('OK', 'ok')}`);
+
+  // Light actions
+  if (Number.isFinite(l)) {
+    if (l <= LIGHT_THRESHOLDS.low) {
+      actions.light.push({ text: 'Low light detected — turn lights ON automatically', severity: 'info' });
+    } else if (l >= LIGHT_THRESHOLDS.high) {
+      actions.light.push({ text: 'Bright ambient light — turn lights OFF to save energy', severity: 'info' });
+    }
+    if (Number.isFinite(prevL) && isNightNow() && prevL <= LIGHT_THRESHOLDS.low && (l - prevL) >= 30 && l >= LIGHT_THRESHOLDS.high) {
+      actions.light.push({ text: 'Sudden light spike at night — trigger intrusion alert', severity: 'alert' });
     }
   }
-  return adv;
-}
 
-function evaluateCombinedAdvice(currentVals, th) {
-  const actions = [];
-  const hot = Number.isFinite(currentVals.temperature) && currentVals.temperature > th.temperature.max;
-  const cold = Number.isFinite(currentVals.temperature) && currentVals.temperature < th.temperature.min;
-  const humid = Number.isFinite(currentVals.humidity) && currentVals.humidity > th.humidity.max;
-  const dry = Number.isFinite(currentVals.humidity) && currentVals.humidity < th.humidity.min;
-  const bright = Number.isFinite(currentVals.light) && currentVals.light >= th.light.high;
-  const dark = Number.isFinite(currentVals.light) && currentVals.light <= th.light.low;
-
-  if (hot && humid) actions.push(`Turn on AC and dehumidifier; ventilate if possible ${badge('Strong', 'alert')}`);
-  if (hot && dry) actions.push(`Run AC and a humidifier to add moisture ${badge('Action', 'warn')}`);
-  if (cold && dry) actions.push(`Turn on heater and humidifier ${badge('Action', 'warn')}`);
-  if (cold && humid) actions.push(`Turn on heater and dehumidify; ensure airflow ${badge('Strong', 'alert')}`);
-  if (bright && hot) actions.push(`Close curtains/blinds to reduce heat gain, run AC ${badge('Action', 'warn')}`);
-  if (dark && !hot && !cold) actions.push(`Only lighting adjustment needed: turn on lights/open curtains ${badge('Info', 'ok')}`);
-  if (!actions.length && (hot || cold || humid || dry || bright || dark)) {
-    actions.push(`Minor adjustments recommended based on individual aspects ${badge('Info', 'ok')}`);
+  // Combined decisions
+  if (Number.isFinite(t) && Number.isFinite(h)) {
+    if (t > TEMP_THRESHOLDS.comfortMax && h > HUMID_THRESHOLDS.comfortMax) {
+      actions.combined.push({ text: 'Hot + Humid — turn on cooling + ventilation', severity: 'warn' });
+    }
   }
+  if (Number.isFinite(t) && Number.isFinite(l)) {
+    if (t < TEMP_THRESHOLDS.comfortMin && l <= LIGHT_THRESHOLDS.low) {
+      actions.combined.push({ text: 'Cool + Dark — lights ON, fan OFF', severity: 'info' });
+    }
+  }
+
+  // Summary
+  const anyAlert = [...actions.temperature, ...actions.humidity, ...actions.light, ...actions.combined].some(a => a.severity === 'alert');
+  if (anyAlert) {
+    actions.summary.push({ text: 'Immediate attention required', severity: 'alert' });
+  } else {
+    const hot = Number.isFinite(t) && t > TEMP_THRESHOLDS.comfortMax;
+    const cold = Number.isFinite(t) && t < TEMP_THRESHOLDS.comfortMin;
+    const humid = Number.isFinite(h) && h > HUMID_THRESHOLDS.comfortMax;
+    const dry = Number.isFinite(h) && h < HUMID_THRESHOLDS.comfortMin;
+    const dark = Number.isFinite(l) && l <= LIGHT_THRESHOLDS.low;
+    const bright = Number.isFinite(l) && l >= LIGHT_THRESHOLDS.high;
+    const bits = [];
+    if (hot) bits.push('cooling recommended');
+    if (cold) bits.push('heating recommended');
+    if (humid) bits.push('ventilation recommended');
+    if (dry) bits.push('humidification recommended');
+    if (dark) bits.push('lights ON suggested');
+    if (bright) bits.push('lights OFF suggested');
+    actions.summary.push({ text: bits.length ? bits.join(' · ') : 'All conditions within comfort range', severity: 'info' });
+  }
+
   return actions;
 }
 
-function updateAdvice() {
-  const per = evaluatePerAspectAdvice(current, thresholds);
-  const combined = evaluateCombinedAdvice(current, thresholds);
-  renderPerAdvice(per);
-  renderCombinedAdvice(combined);
+function renderList(containerId, items) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!items || !items.length) {
+    el.innerHTML = '<div class="action-item ok">No action needed</div>';
+    return;
+  }
+  el.innerHTML = items.map(a => {
+    const badge = a.severity === 'alert' ? 'ALERT' : (a.severity === 'warn' ? 'ACTION' : 'INFO');
+    const cls = a.severity === 'alert' ? 'severity-alert' : (a.severity === 'warn' ? 'severity-warn' : '');
+    return `<div class="action-item ${cls}"><span class="badge">${badge}</span>${a.text}</div>`;
+  }).join('');
 }
 
-function initializeThresholdUI() {
-  const tempMin = document.getElementById('tempMin');
-  const tempMax = document.getElementById('tempMax');
-  const humMin = document.getElementById('humMin');
-  const humMax = document.getElementById('humMax');
-  const lightLow = document.getElementById('lightLow');
-  const lightHigh = document.getElementById('lightHigh');
-  if (!tempMin || !tempMax || !humMin || !humMax || !lightLow || !lightHigh) return;
-
-  tempMin.value = String(thresholds.temperature.min);
-  tempMax.value = String(thresholds.temperature.max);
-  humMin.value = String(thresholds.humidity.min);
-  humMax.value = String(thresholds.humidity.max);
-  lightLow.value = String(thresholds.light.low);
-  lightHigh.value = String(thresholds.light.high);
-
-  function numOrFallback(v, fb) {
-    const n = Number(v);
-    return Number.isFinite(n) ? n : fb;
-  }
-
-  function onChange() {
-    const tmin = numOrFallback(tempMin.value, thresholds.temperature.min);
-    const tmax = numOrFallback(tempMax.value, thresholds.temperature.max);
-    const hmin = numOrFallback(humMin.value, thresholds.humidity.min);
-    const hmax = numOrFallback(humMax.value, thresholds.humidity.max);
-    const llow = Math.max(0, Math.min(100, numOrFallback(lightLow.value, thresholds.light.low)));
-    const lhigh = Math.max(0, Math.min(100, numOrFallback(lightHigh.value, thresholds.light.high)));
-
-    thresholds = {
-      temperature: { min: Math.min(tmin, tmax), max: Math.max(tmin, tmax) },
-      humidity: { min: Math.min(hmin, hmax), max: Math.max(hmin, hmax) },
-      light: { low: Math.min(llow, lhigh), high: Math.max(llow, lhigh) }
-    };
-    LIGHT_THRESHOLDS.low = thresholds.light.low;
-    LIGHT_THRESHOLDS.high = thresholds.light.high;
-    saveThresholdsStore(thresholds);
-    if (Number.isFinite(current.light)) updateLightUI(current.light);
-    updateAdvice();
-  }
-
-  [tempMin, tempMax, humMin, humMax, lightLow, lightHigh].forEach(el => {
-    el.addEventListener('input', onChange);
-    el.addEventListener('change', onChange);
-  });
+function renderSmartActions(res) {
+  renderList('smartSummary', res.summary);
+  renderList('tempActions', res.temperature);
+  renderList('humActions', res.humidity);
+  renderList('lightActions', res.light);
+  renderList('combinedActions', res.combined);
 }
 
 // ---- MQTT (HiveMQ Cloud over WebSockets) ----
@@ -710,15 +753,16 @@ if (historyList.length) {
   }
 }
 
-// Initialize thresholds UI and initial advice
-initializeThresholdUI();
-updateAdvice();
-
 let current = {
   temperature: historyList[0]?.temperature,
   humidity: historyList[0]?.humidity,
   light: historyList[0]?.light
 };
+
+let prevValues = { temperature: current.temperature, humidity: current.humidity, light: current.light };
+if (current.temperature != null && current.humidity != null) {
+  renderSmartActions(evaluateSmartActions(current, prevValues));
+}
 
 let client;
 try {
@@ -770,6 +814,13 @@ if (client) {
       current.light = v;
     }
 
+    // Update smart actions on every message using previous values for spike detection
+    try {
+      const res = evaluateSmartActions(current, prevValues);
+      renderSmartActions(res);
+      prevValues = { temperature: current.temperature, humidity: current.humidity, light: current.light };
+    } catch (_e) { /* ignore render errors */ }
+
     const changed = !lastRecorded || current.temperature !== lastRecorded.t || current.humidity !== lastRecorded.h || current.light !== lastRecorded.l;
     if (changed && current.temperature != null && current.humidity != null) {
       const entry = {
@@ -783,8 +834,6 @@ if (client) {
       renderHistory(historyList);
       lastRecorded = { t: current.temperature, h: current.humidity, l: current.light };
     }
-    // Update advice on every value change
-    updateAdvice();
   });
 }
 </script>
