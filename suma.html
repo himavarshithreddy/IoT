@@ -160,7 +160,7 @@
   /* Mobile tweaks */
   @media (max-width: 768px) {
     body { padding: 20px 10px; }
-    .card { 
+    .card {
       border-radius: 16px;
       padding: clamp(18px, 4vw, 24px);
     }
@@ -174,7 +174,7 @@
       height: clamp(240px, 55vw, 320px);
     }
   }
-  
+
   @media (max-width: 480px) {
     h2 { font-size: clamp(22px, 6vw, 26px); }
     .subtitle { font-size: clamp(11px, 3vw, 13px); }
@@ -480,28 +480,19 @@ function resizeGatesForMobile() {
   const entryGate = document.getElementById('gateEntry');
   const exitGate = document.getElementById('gateExit');
   const svg = document.getElementById('scaleSvg');
+
   if (!entryGate || !exitGate || !svg) return;
 
   if (isMobile) {
-    // Stack vertically: center each gate horizontally in the 1100-wide viewBox
-    const viewBoxWidth = 1100;
-    const scale = 1.15;
-
-    const eb = entryGate.getBBox();
-    const xbEntryCenter = eb.x + eb.width / 2;
-    const dxEntry = (viewBoxWidth / 2) - xbEntryCenter;
-    // Place entry near top (y target ~ 40)
-    const dyEntry = 40 - eb.y;
-    entryGate.setAttribute('transform', `translate(${dxEntry}, ${dyEntry}) scale(${scale})`);
-
-    const xb = exitGate.getBBox();
-    const xbExitCenter = xb.x + xb.width / 2;
-    const dxExit = (viewBoxWidth / 2) - xbExitCenter;
-    // Place exit lower (y target ~ 160)
-    const dyExit = 160 - xb.y;
-    exitGate.setAttribute('transform', `translate(${dxExit}, ${dyExit}) scale(${scale})`);
+    // Adjust viewBox for better mobile display (wider and taller)
+    svg.setAttribute('viewBox', '0 0 1100 300');
+    // Position both gates clearly visible
+    // Entry on left side (x=150), Exit on right side (x=500) with space between
+    entryGate.setAttribute('transform', 'translate(150,50) scale(1.1)');
+    exitGate.setAttribute('transform', 'translate(500,50) scale(1.1)');
   } else {
-    // Desktop - reset transforms to use original coordinates
+    // Desktop - reset viewBox and transforms
+    svg.setAttribute('viewBox', '0 0 1100 240');
     entryGate.removeAttribute('transform');
     exitGate.removeAttribute('transform');
   }
