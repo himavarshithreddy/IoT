@@ -12,9 +12,9 @@
   }
   
   body {
-    background: linear-gradient(135deg, #fef9f3 0%, #fde7d3 100%);
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
     min-height: 100vh;
-    color: #2d2d2d;
+    color: #e2e8f0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
     display: flex;
     flex-direction: column;
@@ -24,9 +24,12 @@
   
   h2 {
     font-size: clamp(24px, 5vw, 32px);
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 8px;
-    color: #2d2d2d;
+    background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     text-align: center;
   }
   
@@ -35,27 +38,28 @@
     margin-bottom: 25px;
     font-size: clamp(12px, 3vw, 14px);
     font-weight: 500;
-    color: #4a4a4a;
+    color: #94a3b8;
     text-align: center;
   }
   
   .card {
-    background: #ffffff;
+    background: rgba(30, 41, 59, 0.8);
+    backdrop-filter: blur(10px);
     padding: clamp(24px, 5vw, 32px);
-    border-radius: 20px;
+    border-radius: 24px;
     width: 100%;
     max-width: 900px;
     text-align: center;
-    border: none;
-    box-shadow: 0 8px 24px rgba(255,107,53,0.12), 0 2px 8px rgba(255,107,53,0.08);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 60px rgba(6, 182, 212, 0.1);
   }
   
   .sensor-item {
-    background: linear-gradient(135deg, #fff5f0 0%, #ffe8db 100%);
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
     padding: clamp(20px, 5vw, 28px);
-    border-radius: 16px;
+    border-radius: 18px;
     margin: 12px 0;
-    border: 2px solid #ffd4b8;
+    border: 1px solid rgba(6, 182, 212, 0.3);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -69,21 +73,22 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    color: #ff6b35;
+    color: #06b6d4;
   }
   
   .value {
     font-size: clamp(36px, 8vw, 48px);
-    font-weight: 600;
-    color: #ff6b35;
+    font-weight: 700;
+    color: #06b6d4;
     letter-spacing: -1px;
+    text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
   }
 
   .viz {
     margin-top: 18px;
-    background: rgba(255,255,255,0.6);
-    border: 2px solid #ffd4b8;
-    border-radius: 16px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    border-radius: 18px;
     overflow: visible;
     padding: clamp(12px, 3vw, 16px);
   }
@@ -102,37 +107,37 @@
     display: none;
     margin-top: 10px;
     font-size: clamp(11px, 2.5vw, 13px);
-    color: #dc2626;
-    background: #fee2e2;
+    color: #f87171;
+    background: rgba(220, 38, 38, 0.1);
     padding: 8px 12px;
     border-radius: 8px;
     font-weight: 500;
-    border: 1px solid #fca5a5;
+    border: 1px solid rgba(220, 38, 38, 0.3);
   }
 
   /* Gates and event lights */
   .gate {
-    filter: drop-shadow(0 2px 6px rgba(139,69,19,0.25));
+    filter: drop-shadow(0 4px 12px rgba(6, 182, 212, 0.3));
   }
   .gate-label {
     font-size: 15px;
-    font-weight: 600;
-    fill: #8b4513;
+    font-weight: 700;
+    fill: #06b6d4;
     text-anchor: middle;
   }
-  .gate-post { fill: #8b4513; stroke: #654321; stroke-width: 2; }
-  .gate-bar  { fill: #d2691e; }
-  .gate-light { fill: #ddd; }
-  .gate-entry-active .gate-light { fill: #10b981; }
-  .gate-exit-active .gate-light { fill: #f59e0b; }
+  .gate-post { fill: #1e293b; stroke: #06b6d4; stroke-width: 3; }
+  .gate-bar  { fill: #334155; stroke: #06b6d4; stroke-width: 2; }
+  .gate-light { fill: #475569; stroke: #64748b; stroke-width: 1; }
+  .gate-entry-active .gate-light { fill: #10b981; stroke: #059669; stroke-width: 2; }
+  .gate-exit-active .gate-light { fill: #f59e0b; stroke: #d97706; stroke-width: 2; }
   .blink {
     animation: blinkPulse 2000ms ease-out 1;
   }
   @keyframes blinkPulse {
-    0% { opacity: 0.3; }
-    25% { opacity: 1; }
-    60% { opacity: 1; }
-    100% { opacity: 1; }
+    0% { opacity: 0.3; filter: brightness(0.5); }
+    25% { opacity: 1; filter: brightness(1.5); }
+    60% { opacity: 1; filter: brightness(1.3); }
+    100% { opacity: 1; filter: brightness(1); }
   }
 
   /* Charts */
@@ -143,20 +148,21 @@
     margin-top: 18px;
   }
   .chart-card {
-    background: #ffffff;
-    border: 2px solid #ffd4b8;
-    border-left: 4px solid #ff6b35;
-    border-radius: 16px;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    border-left: 4px solid #06b6d4;
+    border-radius: 18px;
     padding: 16px;
-    box-shadow: 0 4px 12px rgba(255,107,53,0.08);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(6, 182, 212, 0.1);
   }
   .chart-title {
     font-size: clamp(12px, 3vw, 14px);
-    color: #ff6b35;
+    color: #06b6d4;
     margin-bottom: 12px;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    font-weight: 600;
+    font-weight: 700;
   }
   canvas { width: 100% !important; height: 200px !important; }
 
@@ -239,7 +245,7 @@
 </div>
 
 <div class="card" style="margin-top: 18px; max-width: 900px; width: 100%;">
-  <h3 style="margin:0 0 16px 0; font-size: clamp(18px, 4vw, 22px); font-weight:600; color:#2d2d2d;">📈 Analytics Dashboard</h3>
+  <h3 style="margin:0 0 16px 0; font-size: clamp(18px, 4vw, 22px); font-weight:700; background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">📈 Analytics Dashboard</h3>
   <div class="charts-grid">
     <div class="chart-card">
       <div class="chart-title">Customers Count</div>
@@ -250,8 +256,8 @@
       <canvas id="chartTraffic" aria-label="Traffic rate chart"></canvas>
     </div>
   </div>
-  <small style="color:#4a4a4a; display:block; margin-top:12px;">Last 50 readings</small>
-  <button id="clearBtn" style="margin-top:12px; background:linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); color:#ffffff; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:600; font-size:13px; box-shadow: 0 4px 12px rgba(255,107,53,0.25); transition: all 0.2s ease;">Clear Data</button>
+  <small style="color:#94a3b8; display:block; margin-top:12px;">Last 50 readings</small>
+  <button id="clearBtn" style="margin-top:12px; background:linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%); color:#ffffff; border:none; padding:10px 20px; border-radius:12px; cursor:pointer; font-weight:600; font-size:13px; box-shadow: 0 8px 20px rgba(6, 182, 212, 0.3); transition: all 0.2s ease;">Clear Data</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -268,7 +274,7 @@ function createOrUpdateChart(chartRef, canvasId, label, labels, data, color, yBo
   const ctx = document.getElementById(canvasId);
   if (!ctx) return chartRef;
   if (!chartRef) {
-    const chartDatasets = datasets || [{ label, data, borderColor: color, backgroundColor: color + '33', tension: 0.3, fill: true, pointRadius: 0, borderWidth: 3 }];
+    const chartDatasets = datasets || [{ label, data, borderColor: color, backgroundColor: color + '33', tension: 0.4, fill: true, pointRadius: 0, borderWidth: 3 }];
     return new Chart(ctx, {
       type: 'line',
       data: { labels, datasets: chartDatasets },
@@ -279,13 +285,13 @@ function createOrUpdateChart(chartRef, canvasId, label, labels, data, color, yBo
         plugins: { 
           legend: { 
             display: datasets ? true : false,
-            labels: { color: '#4a4a4a', font: { weight: 600 } }
+            labels: { color: '#94a3b8', font: { weight: 600, size: 12 } }
           }, 
-          tooltip: { enabled: true, backgroundColor: 'rgba(45,45,45,0.9)' } 
+          tooltip: { enabled: true, backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: 'rgba(6, 182, 212, 0.5)', borderWidth: 1 } 
         },
         scales: {
-          x: { ticks: { color: '#4a4a4a', maxRotation: 0, autoSkip: true }, grid: { color: 'rgba(0,0,0,0.05)' } },
-          y: { ticks: { color: '#4a4a4a' }, grid: { color: 'rgba(0,0,0,0.05)' }, min: yBounds?.min, max: yBounds?.max, suggestedMin: yBounds?.suggestedMin, suggestedMax: yBounds?.suggestedMax }
+          x: { ticks: { color: '#94a3b8', maxRotation: 0, autoSkip: true }, grid: { color: 'rgba(148, 163, 184, 0.1)' } },
+          y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(148, 163, 184, 0.1)' }, min: yBounds?.min, max: yBounds?.max, suggestedMin: yBounds?.suggestedMin, suggestedMax: yBounds?.suggestedMax }
         }
       }
     });
@@ -310,15 +316,15 @@ function pushHistory(list, value) {
 function renderCharts() {
   const custLabels = customersHistory.map(i => i.t.toLocaleTimeString());
   const custData = customersHistory.map(i => i.v);
-  customersChart = createOrUpdateChart(customersChart, 'chartCustomers', 'Customers', custLabels, custData, '#ff6b35', { min: 0, suggestedMax: Math.max(5, Math.ceil((Math.max(0, ...custData) + 1) / 5) * 5) });
+  customersChart = createOrUpdateChart(customersChart, 'chartCustomers', 'Customers', custLabels, custData, '#06b6d4', { min: 0, suggestedMax: Math.max(5, Math.ceil((Math.max(0, ...custData) + 1) / 5) * 5) });
 
   // Traffic rate chart: entries and exits per minute
   const trafficLabels = trafficRateData.map(i => i.t.toLocaleTimeString());
   const entriesData = trafficRateData.map(i => i.entries);
   const exitsData = trafficRateData.map(i => i.exits);
   const trafficDatasets = [
-    { label: 'Entries', data: entriesData, borderColor: '#10b981', backgroundColor: '#10b98133', tension: 0.3, fill: true, pointRadius: 0, borderWidth: 3 },
-    { label: 'Exits', data: exitsData, borderColor: '#f59e0b', backgroundColor: '#f59e0b33', tension: 0.3, fill: true, pointRadius: 0, borderWidth: 3 }
+    { label: 'Entries', data: entriesData, borderColor: '#10b981', backgroundColor: '#10b98133', tension: 0.4, fill: true, pointRadius: 0, borderWidth: 3 },
+    { label: 'Exits', data: exitsData, borderColor: '#f59e0b', backgroundColor: '#f59e0b33', tension: 0.4, fill: true, pointRadius: 0, borderWidth: 3 }
   ];
   trafficChart = createOrUpdateChart(trafficChart, 'chartTraffic', 'Traffic', trafficLabels, null, null, { min: 0, suggestedMax: 5 }, trafficDatasets);
 }
